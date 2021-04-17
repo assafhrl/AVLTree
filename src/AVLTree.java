@@ -1,5 +1,3 @@
-import java.rmi.AccessException;
-
 /**
  * public class AVLNode
  * <p>
@@ -14,11 +12,17 @@ import java.rmi.AccessException;
 
 public class AVLTree {
 
+    private AVLNode root;
+    private AVLNode minNode;
+    private AVLNode maxNode;
+
     /**
      * This constructor creates an empty AVLTree.
      */
     public AVLTree(){
-        return; //to be replaced by student code
+        this.root = new AVLNode();
+        this.minNode = new AVLNode();
+        this.maxNode = new AVLNode();
     }
 
     /**
@@ -27,7 +31,7 @@ public class AVLTree {
      * returns true if and only if the tree is empty
      */
     public boolean empty() {
-        return false; // to be replaced by student code
+        return !this.getRoot().isRealNode();
     }
 
     /**
@@ -72,7 +76,7 @@ public class AVLTree {
      * or null if the tree is empty
      */
     public Boolean min() {
-        return null; // to be replaced by student code
+        return this.minNode.getValue();
     }
 
     /**
@@ -82,7 +86,7 @@ public class AVLTree {
      * or null if the tree is empty
      */
     public Boolean max() {
-        return null; // to be replaced by student code
+        return this.maxNode.getValue();
     }
 
     /**
@@ -114,7 +118,7 @@ public class AVLTree {
      * Returns the number of nodes in the tree.
      */
     public int size() {
-        return 42; // to be replaced by student code
+        return this.getRoot().getSize();
     }
 
     /**
@@ -123,6 +127,21 @@ public class AVLTree {
      * Returns the root AVL node, or null if the tree is empty
      */
     public AVLNode getRoot() {
+        return this.getNode(this.root);
+    }
+
+    public AVLNode getMin() {
+        return this.getNode(this.minNode);
+    }
+
+    public AVLNode getMax() {
+        return this.getNode(this.maxNode);
+    }
+
+    private AVLNode getNode(AVLNode node) {
+        if (node.isRealNode()) {
+            return node;
+        }
         return null;
     }
 
@@ -147,7 +166,11 @@ public class AVLTree {
      * @param node - the node whose successor should be returned
      * @return the successor of 'node' if exists, null otherwise
      */
-    public AVLNode successor(AVLNode node){
+    public AVLNode successor(AVLNode node) {
+        return null;
+    }
+
+    public AVLNode predecessor(AVLNode node) {
         return null;
     }
 
@@ -161,7 +184,13 @@ public class AVLTree {
      * precondition: this.search(k) != null
      */
     public boolean succPrefixXor(int k){
-        return false;
+        AVLNode node = this.getMin();
+        int trueCounter = 0;
+        while (node.getKey() <= k) {
+            trueCounter += node.getValue().booleanValue() ? 1 : 0;
+            node = this.successor(node);
+        }
+        return (trueCounter % 2) == 1;
     }
 
 
@@ -187,16 +216,16 @@ public class AVLTree {
         private int height;
         private int booleanValueSum;
 
-        public AVLNode(int key, boolean value) {
+        public AVLNode(int key, Boolean value) {
             this.setKey(key);
-            this.setValue(new Boolean(value));
+            this.setValue(value);
             this.setLeft(new AVLNode(this));
             this.setRight(new AVLNode(this));
             this.setParent(null);
             this.updateFields();
         }
 
-        public AVLNode(int key, boolean value, AVLNode parent) {
+        public AVLNode(int key, Boolean value, AVLNode parent) {
             this(key, value);
             this.setParent(parent);
         }
@@ -229,7 +258,7 @@ public class AVLTree {
         }
 
         //returns node's value [info] (for virtual node return null)
-        public boolean getValue() {
+        public Boolean getValue() {
             return this.value;
         }
 
@@ -311,7 +340,7 @@ public class AVLTree {
         private int calcBooleanValueSum() {
             if (this.isRealNode()) {
                 int ret = this.left.getBooleanValueSum() + this.right.getBooleanValueSum();
-                ret += this.getValue() ? 1 : 0;
+                ret += this.getValue().booleanValue() ? 1 : 0;
                 return ret;
             }
             return 0;
