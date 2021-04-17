@@ -1,3 +1,5 @@
+import java.rmi.AccessException;
+
 /**
  * public class AVLNode
  * <p>
@@ -176,59 +178,160 @@ public class AVLTree {
      */
     public class AVLNode {
 
+        private int key;
+        private Boolean value;
+        private AVLNode parent;
+        private AVLNode left;
+        private AVLNode right;
+        private int size;
+        private int height;
+        private int booleanValueSum;
+
+        public AVLNode(int key, boolean value) {
+            this.setKey(key);
+            this.setValue(new Boolean(value));
+            this.setLeft(new AVLNode(this));
+            this.setRight(new AVLNode(this));
+            this.setParent(null);
+            this.updateFields();
+        }
+
+        public AVLNode(int key, boolean value, AVLNode parent) {
+            this(key, value);
+            this.setParent(parent);
+        }
+
+        public AVLNode() {
+            this.setKey(-1);
+            this.setValue(null);
+            this.setLeft(null);
+            this.setRight(null);
+            this.setParent(null);
+            this.updateFields();
+        }
+
+        public AVLNode(AVLNode parent) {
+            this();
+            this.setParent(parent);
+        }
+
+        private void setKey(int key) {
+            this.key = key;
+        }
+
         //returns node's key (for virtual node return -1)
         public int getKey() {
-            return 42; // to be replaced by student code
+            return this.key;
+        }
+
+        private void setValue(Boolean value) {
+            this.value = value;
         }
 
         //returns node's value [info] (for virtual node return null)
         public boolean getValue() {
-            return false; // to be replaced by student code
+            return this.value;
         }
 
         //sets left child
         public void setLeft(AVLNode node) {
-            return; // to be replaced by student code
+            if (this.isRealNode()) {
+                this.left = node;
+            }
         }
 
         //returns left child (if there is no left child return null)
         public AVLNode getLeft() {
-            return null; // to be replaced by student code
+            return this.left;
         }
 
         //sets right child
         public void setRight(AVLNode node) {
-            return; // to be replaced by student code
+            if (this.isRealNode()) {
+                this.right = node;
+            }
         }
 
         //returns right child (if there is no right child return null)
         public AVLNode getRight() {
-            return null; // to be replaced by student code
+            return this.right;
         }
 
         //sets parent
         public void setParent(AVLNode node) {
-            return; // to be replaced by student code
+            this.parent = node;
         }
 
         //returns the parent (if there is no parent return null)
         public AVLNode getParent() {
-            return null; // to be replaced by student code
+            return this.parent;
         }
 
         // Returns True if this is a non-virtual AVL node
         public boolean isRealNode() {
-            return true; // to be replaced by student code
+            return this.key != -1;
         }
 
         // sets the height of the node
-        public void setHeight(int height) {
-            return; // to be replaced by student code
+        private void setHeight() {
+            this.height = this.calcHeight();
+        }
+
+        private int calcHeight() {
+            if (this.isRealNode()) {
+                return Math.max(this.left.getHeight(), this.right.getHeight()) + 1;
+            }
+            return -1;
         }
 
         // Returns the height of the node (-1 for virtual nodes)
         public int getHeight() {
-            return 42; // to be replaced by student code
+            return this.height;
+        }
+
+        private void setSize() {
+            this.size = this.calcSize();
+        }
+
+        private int calcSize() {
+            if (this.isRealNode()) {
+                return this.left.getSize() + this.right.getSize() + 1;
+            }
+            return 0;
+        }
+
+        public int getSize() {
+            return this.size;
+        }
+
+        private void setBooleanValueSum() {
+            this.booleanValueSum = this.calcBooleanValueSum();
+        }
+
+        private int calcBooleanValueSum() {
+            if (this.isRealNode()) {
+                int ret = this.left.getBooleanValueSum() + this.right.getBooleanValueSum();
+                ret += this.getValue() ? 1 : 0;
+                return ret;
+            }
+            return 0;
+        }
+
+        public int getBooleanValueSum() {
+            return this.booleanValueSum;
+        }
+
+        public void updateFields() {
+            this.setHeight();
+            this.setSize();
+            this.setBooleanValueSum();
+        }
+
+        public int getBF() {
+            if (this.isRealNode()) {
+                return this.left.getHeight() - this.right.getHeight();
+            }
+            return -1;
         }
     }
 
