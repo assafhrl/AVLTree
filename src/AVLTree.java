@@ -80,12 +80,29 @@ public class AVLTree {
         }
         newChild.setParent(parent);
     }
+    private void updateMinInsert(AVLNode node) {
+        if (node.getKey() < this.getMin().getKey()) {
+            this.setMin(node);
+        }
+    }
+
+    private void  updateMaxInsert(AVLNode node) {
+        if (node.getKey() > this.getMax().getKey()) {
+            this.setMax(node);
+        }
+    }
+
+    private void updateMinMaxInsert(AVLNode node) {
+        updateMinInsert(node);
+        updateMaxInsert(node);
+    }
 
     public int insert(int k, boolean i) {
         AVLNode node = new AVLNode(k, new Boolean(i));
         if (!insertNode(node)) {
             return -1;
         }
+        updateMinMaxInsert(node);
         int ops = this.updatePath(node);
         return ops;
     }
