@@ -21,6 +21,10 @@ public class AVLTree {
      * This constructor creates an empty AVLTree.
      */
     public AVLTree(){
+        this.initTree();
+    }
+
+    private void initTree() {
         this.root = new AVLNode();
         this.minNode = new AVLNode();
         this.maxNode = new AVLNode();
@@ -81,7 +85,8 @@ public class AVLTree {
         newChild.setParent(parent);
     }
     private void updateMinInsert(AVLNode node) {
-        if (node.getKey() < this.getMin().getKey()) {
+        AVLNode currentMin = this.getMin();
+        if (!currentMin.isRealNode() || node.getKey() < this.getMin().getKey()) {
             this.setMin(node);
         }
     }
@@ -103,13 +108,12 @@ public class AVLTree {
             return -1;
         }
         updateMinMaxInsert(node);
-        int ops = this.updatePath(node);
-        return ops;
+        return this.updatePath(node);
     }
 
     private boolean insertNode(AVLNode node) {
         AVLNode nodeLoc = this.searchNode(node.getKey());
-        if (!nodeLoc.isRealNode()) {
+        if (nodeLoc.isRealNode()) {
             return false;
         }
         updateParentChild(nodeLoc, node);
@@ -145,7 +149,79 @@ public class AVLTree {
      * returns -1 if an item with key k was not found in the tree.
      */
     public int delete(int k) {
-        return 42;    // to be replaced by student code
+        AVLNode nodeLoc = this.searchNode(k);
+        if (!nodeLoc.isRealNode()) {
+            return -1;
+        }
+        nodeLoc = this.deleteNode(nodeLoc);
+        return updatePath(nodeLoc);
+    }
+
+    private void disconnectNode(AVLNode node, AVLNode parent, AVLNode child) {
+        if (parent.getLeft() == node) {
+            parent.setLeft(child);
+        }
+        else {
+            parent.setRight(child);
+        }
+        child.setParent(parent);
+        node.resetConnections();
+    }
+
+    private AVLNode deleteNodeLeaf(AVLNode node){
+        AVLNode parent = node.getParent();
+        if (parent == null) {
+            this.initTree();
+            return this.getRoot();
+        }
+        AVLNode child = new AVLNode();
+        disconnectNode(node, parent, child);
+        return child;
+    }
+
+    private AVLNode deleteNodeSingleChild(AVLNode node, AVLNode child) {
+        AVLNode parent = node.getParent();
+        if (parent == null) {
+            this.setRoot(child);
+            child.setParent(null);
+            node.resetConnections();
+        }
+        else {
+            this.disconnectNode(node, parent, child);
+        }
+        return child;
+    }
+
+    private AVLNode deleteNodeTwoChildren(AVLNode node){
+        AVLNode successor = this.successorChild(node);
+        AVLNode successorChild = this.deleteNode(successor);
+        successor.setLeft(node.getLeft());
+        successor.setRight(node.getRight());
+        AVLNode parent = node.getParent();
+        if (parent == null) {
+            this.setRoot(successor);
+        }
+        else {
+            this.disconnectNode(node, parent, successor);
+        }
+        return successorChild;
+    }
+
+    private AVLNode deleteNode(AVLNode node) {
+        AVLNode leftChild = node.getLeft();
+        AVLNode rightChild = node.getRight();
+        boolean leftChildReal = leftChild.isRealNode();
+        boolean rightChildReal = rightChild.isRealNode();
+        if (leftChildReal && rightChildReal) {
+            return deleteNodeTwoChildren(node);
+        }
+        if (leftChildReal) {
+            return deleteNodeSingleChild(node, leftChild);
+        }
+        if (rightChildReal) {
+            return deleteNodeSingleChild(node, rightChild);
+        }
+        return deleteNodeLeaf(node);
     }
 
     private boolean rotate(AVLNode node) {
@@ -573,6 +649,12 @@ public class AVLTree {
                 return this.left.getHeight() - this.right.getHeight();
             }
             return -1;
+        }
+
+        public void resetConnections() {
+            this.setLeft(new AVLNode(this));
+            this.setRight(new AVLNode(this));
+            this.setParent(null);
         }
     }
 }
