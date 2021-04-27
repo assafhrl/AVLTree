@@ -18,27 +18,35 @@ public class AVLTree {
     private int size;
 
     /**
-     * This constructor creates an empty AVLTree.
+     * Create an empty AVLTree object
      */
     public AVLTree(){
         this.initTree();
     }
 
+    /**
+     * Initilize the fields of an empty AVLTree, and overrides them if not empty
+     */
     private void initTree() {
-        this.root = new AVLNode();
-        this.minNode = new AVLNode();
-        this.maxNode = new AVLNode();
+        this.setRoot(new AVLNode());
+        this.setMin(new AVLNode());
+        this.setMax(new AVLNode());
+        this.setSize(0);
     }
 
     /**
-     * public boolean empty()
-     * <p>
-     * returns true if and only if the tree is empty
+     * Checks if the AVLTree is empty
+     * @return true if tree empty else false
      */
     public boolean empty() {
-        return !this.getRoot().isRealNode();
+        return !this.getRootVirtual().isRealNode();
     }
 
+    /**
+     * Search for AVLNode object in the AVLTree by key
+     * @param k - key of searched node
+     * @return the searched node if exists, else a virtual node where node should exist
+     */
     private AVLNode searchNode(int k) {
         AVLNode node = this.root;
         while (node.isRealNode() && node.getKey() != k) {
@@ -52,26 +60,20 @@ public class AVLTree {
         return node;
     }
     /**
-     * public boolean search(int k)
-     * <p>
-     * returns the info of an item with key k if it exists in the tree
-     * otherwise, returns null
+     * Searches for a key in the AVLTree
+     * @param k - Key to search
+     * @return if key exists, the return value is the info of the node, else returns null
      */
     public Boolean search(int k) {
         return this.searchNode(k).getValue();
     }
 
     /**
-     * public int insert(int k, boolean i)
-     * <p>
-     * inserts an item with key k and info i to the AVL tree.
-     * the tree must remain valid (keep its invariants).
-	 * returns the number of nodes which require rebalancing operations (i.e. promotions or rotations).
-	 * This always includes the newly-created node.
-     * returns -1 if an item with key k already exists in the tree.
+     * Change the child of a parent from an old child to a different new child
+     * @param oldChild - The current child of the AVLNode
+     * @param newChild - The soon to be new child of the AVLNode
      */
-
-    private void updateParentChild(AVLNode oldChild, AVLNode newChild) {
+     private void updateParentChild(AVLNode oldChild, AVLNode newChild) {
         AVLNode parent = oldChild.getParent();
         if (parent == null) {
             this.setRoot(newChild);
@@ -84,46 +86,83 @@ public class AVLTree {
         }
         newChild.setParent(parent);
     }
+
+    /**
+     * Checks if there is a need to change the pointer to the minimum node while performing an
+     * insertion operation. If so, then updates the pointer.
+     * @param node - Node to check if should be new minimum.
+     */
     private void updateMinInsert(AVLNode node) {
         AVLNode currentMin = this.getMin();
-        if (!currentMin.isRealNode() || node.getKey() < this.getMin().getKey()) {
+        if (!currentMin.isRealNode() || node.getKey() < currentMin.getKey()) {
             this.setMin(node);
         }
     }
 
+    /**
+     * Checks if there is a need to change the pointer to the maximum node while performing an
+     * insertion operation. If so, then updates the pointer.
+     * @param node - Node to check if should be new maximum.
+     */
     private void  updateMaxInsert(AVLNode node) {
-        if (node.getKey() > this.getMax().getKey()) {
+        AVLNode currentMax = this.getMax();
+        if (!currentMax.isRealNode() || node.getKey() > this.getMax().getKey()) {
             this.setMax(node);
         }
     }
 
+    /**
+     * Checks if there is a need to change the pointer to the maximum and or minimum node while
+     * performing an insertion operation. If so, then updates the pointer.
+     * @param node - Node to check if should be new minimum and maximum.
+     */
     private void updateMinMaxInsert(AVLNode node) {
         updateMinInsert(node);
         updateMaxInsert(node);
     }
 
+    /**
+     * Inserts an item to the AVLTree if key doesn't exists, else does nothing. Also makes sure
+     * the tree will remain valid.
+     * @param k - Key to insert to tree
+     * @param i - Value to insert to tree
+     * @return - The number of nodes which require rebalancing operations. This always includes the
+     * newly created node. If no node was inserted, then returns -1.
+     */
     public int insert(int k, boolean i) {
         AVLNode node = new AVLNode(k, new Boolean(i));
         if (!insertNode(node)) {
             return -1;
         }
+        this.incrementSize();
+        int ops = this.updatePath(node) + 1;
         updateMinMaxInsert(node);
-        return this.updatePath(node);
+        return ops;
     }
 
+    /**
+     * Insert the physical AVLNode into the AVLTree if key doesn't exists.
+     * @param node - The node to insert into the tree.
+     * @return true if insertion has taken place, else false.
+     */
     private boolean insertNode(AVLNode node) {
         AVLNode nodeLoc = this.searchNode(node.getKey());
         if (nodeLoc.isRealNode()) {
             return false;
         }
         updateParentChild(nodeLoc, node);
-        this.incrementSize();
         nodeLoc.setParent(null);
         return true;
     }
 
+    /**
+     * Checks the path from given node to root. Updates fields of nodes on the path and performs
+     * rebalancing operations if needed.
+     * @param node - Starting node to check path from it to root node.
+     * @return - The number of rebalancing operations.
+     */
     private int updatePath(AVLNode node) {
-        int ops = 1;
+        int ops = 0;
         while (node != null) {
             if (rotate(node)) {
                 ops += 1;
@@ -141,22 +180,29 @@ public class AVLTree {
     }
 
     /**
-     * public int delete(int k)
-     * <p>
-     * deletes an item with key k from the binary tree, if it is there;
-     * the tree must remain valid (keep its invariants).
-     * returns the number of nodes which required rebalancing operations (i.e. demotions or rotations).
-     * returns -1 if an item with key k was not found in the tree.
+     * Deletes an item from the AVLTree if key exists. Also makes sure the tree will remain valid.
+     * @param k - The key to delete from the AVLTree.
+     * @return - If key exists, then returns the number of rebalancing operations needed to perform,
+     * else -1.
      */
     public int delete(int k) {
         AVLNode nodeLoc = this.searchNode(k);
         if (!nodeLoc.isRealNode()) {
             return -1;
         }
-        nodeLoc = this.deleteNode(nodeLoc);
-        return updatePath(nodeLoc);
+        AVLNode updatePathStartNode = this.deleteNode(nodeLoc);
+        this.decrementSize();
+        int ops = updatePath(updatePathStartNode) + 1;
+        updateMinMaxDelete(nodeLoc);
+        return ops;
     }
 
+    /**
+     * Bypass the connection through a node from the parent to child nodes.
+     * @param node - Node to bypass and remove from tree.
+     * @param parent - node object parent
+     * @param child - node object child to conect to parent
+     */
     private void disconnectNode(AVLNode node, AVLNode parent, AVLNode child) {
         if (parent.getLeft() == node) {
             parent.setLeft(child);
@@ -168,17 +214,28 @@ public class AVLTree {
         node.resetConnections();
     }
 
+    /**
+     * Perform a physical delete operation from the tree when the node is a leaf.
+     * @param node - Leaf node to physically delete from the tree.
+     * @return - node to start checking path from while performing the rebalancing operations.
+     */
     private AVLNode deleteNodeLeaf(AVLNode node){
         AVLNode parent = node.getParent();
         if (parent == null) {
             this.initTree();
-            return this.getRoot();
+            return this.getRootVirtual();
         }
         AVLNode child = new AVLNode();
         disconnectNode(node, parent, child);
         return child;
     }
 
+    /**
+     * Perform a physical delete operation from the tree when the node has a single child.
+     * @param node - The node to physically delete from the tree.
+     * @param child - The single child of the node to bypass the conection from parent to child.
+     * @return - node to start checking path from while performing the rebalancing operations.
+     */
     private AVLNode deleteNodeSingleChild(AVLNode node, AVLNode child) {
         AVLNode parent = node.getParent();
         if (parent == null) {
@@ -192,11 +249,20 @@ public class AVLTree {
         return child;
     }
 
+    /**
+     * Perform a physical delete operation from the tree when the node has two children.
+     * @param node - The node to physically delete from the tree.
+     * @return node to start checking path from while performing the rebalancing operations.
+     */
     private AVLNode deleteNodeTwoChildren(AVLNode node){
         AVLNode successor = this.successorChild(node);
         AVLNode successorChild = this.deleteNode(successor);
-        successor.setLeft(node.getLeft());
-        successor.setRight(node.getRight());
+        AVLNode nodeLeft = node.getLeft();
+        AVLNode nodeRight = node.getRight();
+        successor.setLeft(nodeLeft);
+        successor.setRight(nodeRight);
+        nodeLeft.setParent(successor);
+        nodeRight.setParent(successor);
         AVLNode parent = node.getParent();
         if (parent == null) {
             this.setRoot(successor);
@@ -207,6 +273,11 @@ public class AVLTree {
         return successorChild;
     }
 
+    /**
+     * Perform the physical delete operation of a node from the tree by classifying the node type.
+     * @param node - The node to physically delete from the tree.
+     * @return - node to start checking path from while performing the rebalancing operations.
+     */
     private AVLNode deleteNode(AVLNode node) {
         AVLNode leftChild = node.getLeft();
         AVLNode rightChild = node.getRight();
@@ -224,6 +295,48 @@ public class AVLTree {
         return deleteNodeLeaf(node);
     }
 
+    /**
+     * Checks if there is a need to change the pointer to the maximum and or minimum node while
+     * performing a deletion operation. If so, then updates the pointer.
+     * @param node - Deleted node to check if it were previously minimum or maximum.
+     */
+    private void updateMinMaxDelete(AVLNode node) {
+        updateMinDelete(node);
+        updateMaxDelete(node);
+    }
+
+    /**
+     * Checks if there is a need to change the pointer to the  minimum node while
+     * performing a deletion operation. If so, then updates the pointer.
+     * @param node - Deleted node to check if it were previously minimum.
+     */
+    private void updateMinDelete(AVLNode node) {
+        AVLNode currentMin = this.getMin();
+        if (currentMin == node) {
+            AVLNode newMin = calcMin();
+            this.setMin(newMin);
+        }
+    }
+
+    /**
+     * Checks if there is a need to change the pointer to the  maximum node while
+     * performing a deletion operation. If so, then updates the pointer.
+     * @param node - Deleted node to check if it were previously maximum.
+     */
+    private void updateMaxDelete(AVLNode node) {
+        AVLNode currentMax = this.getMin();
+        if (currentMax == node) {
+            AVLNode newMax = calcMax();
+            this.setMax(newMax);
+        }
+    }
+
+    /**
+     * Checks if the node is out of balance by calculation the balance factor, and deciding, if nessecery,
+     * which set of ratations should take place
+     * @param node - The node to check if it's out of balance.
+     * @return - true if a rotation has taken place, else false.
+     */
     private boolean rotate(AVLNode node) {
         int bf = node.getBF();
         if (bf >= -1 && bf <= 1) {
@@ -245,6 +358,10 @@ public class AVLTree {
         return true;
     }
 
+    /**
+     * Perform a left rotation on a node.
+     * @param node - The root node to perform a left rotation on.
+     */
     private void rotateLeft(AVLNode node) {
         AVLNode right = node.getRight();
         AVLNode rightLeft = right.getLeft();
@@ -255,6 +372,10 @@ public class AVLTree {
         node.setParent(right);
     }
 
+    /**
+     * Perform a right rotation on a node.
+     * @param node
+     */
     private void rotateRight(AVLNode node) {
         AVLNode left = node.getLeft();
         AVLNode leftRight = left.getRight();
@@ -266,25 +387,25 @@ public class AVLTree {
     }
 
     /**
-     * public Boolean min()
-     * <p>
-     * Returns the info of the item with the smallest key in the tree,
-     * or null if the tree is empty
+     * Get the info of the item with the smallest key in the tree.
+     * @return If AVLTree isn't empty then info of value with smallest key in tree else null.
      */
     public Boolean min() {
         return this.getMin().getValue();
     }
 
     /**
-     * public Boolean max()
-     * <p>
-     * Returns the info of the item with the largest key in the tree,
-     * or null if the tree is empty
+     * Get the info of the item with the largest key in the tree.
+     * @return If AVLTree isn't empty then info of value with largest key in tree else null.
      */
     public Boolean max() {
         return this.getMax().getValue();
     }
 
+    /**
+     * Get a sorted array by key of all AVLNodes in the tree.
+     * @return - Sorted array of AVLNodes by key in tree, or an empty array if tree is empty.
+     */
     private AVLNode[] nodesToArray() {
         AVLNode[] arr = new AVLNode[this.getSize()];
         AVLNode node = this.getMin();
@@ -296,10 +417,8 @@ public class AVLTree {
     }
 
     /**
-     * public int[] keysToArray()
-     * <p>
-     * Returns a sorted array which contains all keys in the tree,
-     * or an empty array if the tree is empty.
+     * Get a sorted array by key of all keys in the tree.
+     * @return - Sorted array of keys by key in the tree, or an empty array if tree is empty.
      */
     public int[] keysToArray() {
         int[] arr = new int[this.getSize()];
@@ -311,11 +430,8 @@ public class AVLTree {
     }
 
     /**
-     * public boolean[] infoToArray()
-     * <p>
-     * Returns an array which contains all info in the tree,
-     * sorted by their respective keys,
-     * or an empty array if the tree is empty.
+     * Get a sorted array by key of all info in the tree.
+     * @return - Sorted array of info by key in the tree, or an empty array if tree is empty.
      */
     public boolean[] infoToArray() {
         boolean[] arr = new boolean[this.getSize()];
@@ -327,21 +443,30 @@ public class AVLTree {
     }
 
     /**
-     * public int size()
-     * <p>
-     * Returns the number of nodes in the tree.
+     * Get the number of nodes in the tree
+     * @return - Returns the number of nodes in the tree.
      */
     public int size() {
         return this.getSize();
     }
 
     /**
-     * public int getRoot()
-     * <p>
-     * Returns the root AVL node, or null if the tree is empty
+     * Get the root node of the tree
+     * @return - AVLNode root, including virtual node if tree is empty.
+     */
+    public AVLNode getRootVirtual() {
+        return this.root;
+    }
+
+    /**
+     * Get the root node of the tree
+     * @return - if tree in not empty then AVLNode root, else null.
      */
     public AVLNode getRoot() {
-        return this.getNode(this.root);
+        if (this.empty()) {
+            return null;
+        }
+        return this.getRootVirtual();
     }
 
     private void setRoot(AVLNode root) {
@@ -349,26 +474,43 @@ public class AVLTree {
     }
 
     public AVLNode getMin() {
-        return this.getNode(this.minNode);
+        return this.minNode;
     }
 
     private void setMin(AVLNode node) {
         this.minNode = node;
     }
 
+    private AVLNode calcMin() {
+        AVLNode newMin = this.getRootVirtual();
+        if (!this.empty()) {
+            AVLNode newMinLeft = newMin.getLeft();
+            while (newMinLeft.isRealNode()) {
+                newMin = newMinLeft;
+                newMinLeft = newMin.getLeft();
+            }
+        }
+        return newMin;
+    }
+
     public AVLNode getMax() {
-        return this.getNode(this.maxNode);
+        return this.maxNode;
     }
 
     private void setMax(AVLNode node) {
         this.maxNode = node;
     }
 
-    private AVLNode getNode(AVLNode node) {
-        if (node.isRealNode()) {
-            return node;
+    private AVLNode calcMax() {
+        AVLNode newMax = this.getRootVirtual();
+        if (!this.empty()) {
+            AVLNode newMaxRight = newMax.getRight();
+            while (newMaxRight.isRealNode()) {
+                newMax = newMaxRight;
+                newMaxRight = newMax.getRight();
+            }
         }
-        return null;
+        return newMax;
     }
 
     private void setSize(int size) {
@@ -379,7 +521,7 @@ public class AVLTree {
         this.setSize(this.getSize() + 1);
     }
 
-    private void DecrementSize() {
+    private void decrementSize() {
         this.setSize(this.getSize() - 1);
     }
 
