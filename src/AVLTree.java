@@ -2,12 +2,6 @@
  * public class AVLNode
  * <p>
  * This class represents an AVLTree with integer keys and boolean values.
- * <p>
- * IMPORTANT: do not change the signatures of any function (i.e. access modifiers, return type, function name and
- * arguments. Changing these would break the automatic tester, and would result in worse grade.
- * <p>
- * However, you are allowed (and required) to implement the given functions, and can add functions of your own
- * according to your needs.
  */
 
 public class AVLTree {
@@ -51,10 +45,10 @@ public class AVLTree {
         AVLNode node = this.root;
         while (node.isRealNode() && node.getKey() != k) {
             if (node.getKey() > k) {
-                node = node.getLeft();
+                node = node.getLeftVirtual();
             }
             else {
-                node = node.getRight();
+                node = node.getRightVirtual();
             }
         }
         return node;
@@ -78,7 +72,7 @@ public class AVLTree {
         if (parent == null) {
             this.setRoot(newChild);
         }
-        else if (parent.getLeft() == oldChild) {
+        else if (parent.getLeftVirtual() == oldChild) {
             parent.setLeft(newChild);
         }
         else {
@@ -167,8 +161,8 @@ public class AVLTree {
             if (rotate(node)) {
                 ops += 1;
                 node = node.getParent();
-                node.getLeft().updateFields();
-                node.getRight().updateFields();
+                node.getLeftVirtual().updateFields();
+                node.getRightVirtual().updateFields();
                 node.updateFields();
             } else {
                 ops += node.updateHeightAndReport();
@@ -204,7 +198,7 @@ public class AVLTree {
      * @param child - node object child to conect to parent
      */
     private void disconnectNode(AVLNode node, AVLNode parent, AVLNode child) {
-        if (parent.getLeft() == node) {
+        if (parent.getLeftVirtual() == node) {
             parent.setLeft(child);
         }
         else {
@@ -257,8 +251,8 @@ public class AVLTree {
     private AVLNode deleteNodeTwoChildren(AVLNode node){
         AVLNode successor = this.successorChild(node);
         AVLNode successorChild = this.deleteNode(successor);
-        AVLNode nodeLeft = node.getLeft();
-        AVLNode nodeRight = node.getRight();
+        AVLNode nodeLeft = node.getLeftVirtual();
+        AVLNode nodeRight = node.getRightVirtual();
         successor.setLeft(nodeLeft);
         successor.setRight(nodeRight);
         nodeLeft.setParent(successor);
@@ -279,8 +273,8 @@ public class AVLTree {
      * @return - node to start checking path from while performing the rebalancing operations.
      */
     private AVLNode deleteNode(AVLNode node) {
-        AVLNode leftChild = node.getLeft();
-        AVLNode rightChild = node.getRight();
+        AVLNode leftChild = node.getLeftVirtual();
+        AVLNode rightChild = node.getRightVirtual();
         boolean leftChildReal = leftChild.isRealNode();
         boolean rightChildReal = rightChild.isRealNode();
         if (leftChildReal && rightChildReal) {
@@ -343,15 +337,15 @@ public class AVLTree {
             return false;
         }
         if (bf < 0) {
-           int rightBF = node.getRight().getBF();
+           int rightBF = node.getRightVirtual().getBF();
            if (rightBF > 0) {
-               this.rotateRight(node.getRight());
+               this.rotateRight(node.getRightVirtual());
            }
            this.rotateLeft(node);
         } else {
-            int leftBF = node.getLeft().getBF();
+            int leftBF = node.getLeftVirtual().getBF();
             if (leftBF < 0) {
-                this.rotateLeft(node.getLeft());
+                this.rotateLeft(node.getLeftVirtual());
             }
             this.rotateRight(node);
         }
@@ -363,8 +357,8 @@ public class AVLTree {
      * @param node - The root node to perform a left rotation on.
      */
     private void rotateLeft(AVLNode node) {
-        AVLNode right = node.getRight();
-        AVLNode rightLeft = right.getLeft();
+        AVLNode right = node.getRightVirtual();
+        AVLNode rightLeft = right.getLeftVirtual();
         updateParentChild(node, right);
         node.setRight(rightLeft);
         rightLeft.setParent(node);
@@ -377,8 +371,8 @@ public class AVLTree {
      * @param node
      */
     private void rotateRight(AVLNode node) {
-        AVLNode left = node.getLeft();
-        AVLNode leftRight = left.getRight();
+        AVLNode left = node.getLeftVirtual();
+        AVLNode leftRight = left.getRightVirtual();
         updateParentChild(node, left);
         node.setLeft(leftRight);
         leftRight.setParent(node);
@@ -500,10 +494,10 @@ public class AVLTree {
     private AVLNode calcMin() {
         AVLNode newMin = this.getRootVirtual();
         if (!this.empty()) {
-            AVLNode newMinLeft = newMin.getLeft();
+            AVLNode newMinLeft = newMin.getLeftVirtual();
             while (newMinLeft.isRealNode()) {
                 newMin = newMinLeft;
-                newMinLeft = newMin.getLeft();
+                newMinLeft = newMin.getLeftVirtual();
             }
         }
         return newMin;
@@ -532,10 +526,10 @@ public class AVLTree {
     private AVLNode calcMax() {
         AVLNode newMax = this.getRootVirtual();
         if (!this.empty()) {
-            AVLNode newMaxRight = newMax.getRight();
+            AVLNode newMaxRight = newMax.getRightVirtual();
             while (newMaxRight.isRealNode()) {
                 newMax = newMaxRight;
-                newMaxRight = newMax.getRight();
+                newMaxRight = newMax.getRightVirtual();
             }
         }
         return newMax;
@@ -577,7 +571,7 @@ public class AVLTree {
      * @return
      */
     private int calcLeftBooleanValueSum(AVLNode node) {
-        int ret = node.getLeft().getBooleanValueSum();
+        int ret = node.getLeftVirtual().getBooleanValueSum();
         ret += node.getValue().booleanValue() ? 1 : 0;
         return ret;
     }
@@ -594,7 +588,7 @@ public class AVLTree {
         int booleanValueSum = calcLeftBooleanValueSum(node);
         AVLNode next = node.getParent();
         while (next != null) {
-            if (node == next.getRight()) {
+            if (node == next.getRightVirtual()) {
                 booleanValueSum += calcLeftBooleanValueSum(node);
             }
             node = next;
@@ -609,9 +603,9 @@ public class AVLTree {
      * @return - Successor node.
      */
     private AVLNode successorChild(AVLNode node) {
-        node = node.getRight();
+        node = node.getRightVirtual();
         while (node.isRealNode()) {
-            node = node.getLeft();
+            node = node.getLeftVirtual();
         }
         return node.getParent();
     }
@@ -623,7 +617,7 @@ public class AVLTree {
      */
     private AVLNode successorParent(AVLNode node) {
         AVLNode next = node.getParent();
-        while (next != null && next.getLeft() != node) {
+        while (next != null && next.getLeftVirtual() != node) {
             node = next;
             next = node.getParent();
         }
@@ -636,7 +630,7 @@ public class AVLTree {
      * @return - Successor node if exists, else null.
      */
     public AVLNode successor(AVLNode node) {
-        if (node.getRight().isRealNode()) {
+        if (node.getRightVirtual().isRealNode()) {
             return successorChild(node);
         }
         return successorParent(node);
@@ -648,9 +642,9 @@ public class AVLTree {
      * @return - Predecessor node.
      */
     private AVLNode predecessorChild(AVLNode node) {
-        node = node.getLeft();
+        node = node.getLeftVirtual();
         while (node.isRealNode()) {
-            node = node.getRight();
+            node = node.getRightVirtual();
         }
         return node.getParent();
     }
@@ -662,7 +656,7 @@ public class AVLTree {
      */
     private AVLNode predecessorParent(AVLNode node) {
         AVLNode next = node.getParent();
-        while (next != null && next.getRight() != node) {
+        while (next != null && next.getRightVirtual() != node) {
             node = next;
             next = node.getParent();
         }
@@ -675,7 +669,7 @@ public class AVLTree {
      * @return - Predecessor node if exists, else null.
      */
     public AVLNode predecessor(AVLNode node) {
-        if (node.getLeft().isRealNode()) {
+        if (node.getLeftVirtual().isRealNode()) {
             return predecessorChild(node);
         }
         return predecessorParent(node);
@@ -703,12 +697,6 @@ public class AVLTree {
      * public class AVLNode
      * <p>
      * This class represents a node in the AVL tree.
-     * <p>
-     * IMPORTANT: do not change the signatures of any function (i.e. access modifiers, return type, function name and
-     * arguments. Changing these would break the automatic tester, and would result in worse grade.
-     * <p>
-     * However, you are allowed (and required) to implement the given functions, and can add functions of your own
-     * according to your needs.
      */
     public class AVLNode {
 
@@ -748,75 +736,150 @@ public class AVLTree {
             this.setParent(parent);
         }
 
+        /**
+         * Set the node's key.
+         * @param key - Key to set.
+         */
         private void setKey(int key) {
             this.key = key;
         }
 
-        //returns node's key (for virtual node return -1)
+        /**
+         * Get node's key
+         * @return If real node return key, else -1.
+         */
         public int getKey() {
             return this.key;
         }
 
+        /**
+         * Set the node's value
+         * @param value - Value to set.
+         */
         private void setValue(Boolean value) {
             this.value = value;
         }
 
-        //returns node's value [info] (for virtual node return null)
+        /**
+         * Get the node's value.
+         * @return - If real node return value, else null.
+         */
         public Boolean getValue() {
             return this.value;
         }
 
-        //sets left child
+        /**
+         * Sets the left child of node, if not virtual, else does nothing.
+         * @param node - Node to set as left node.
+         */
         public void setLeft(AVLNode node) {
             if (this.isRealNode()) {
                 this.left = node;
             }
         }
 
-        //returns left child (if there is no left child return null)
-        public AVLNode getLeft() {
+        /**
+         * Get the node's left child.
+         * @return - If real node then return left child including virtual, else null.
+         */
+        public AVLNode getLeftVirtual() {
             return this.left;
         }
 
-        //sets right child
+        /**
+         * Get the node's left child.
+         * @return - If left child exists return node, else null.
+         */
+        public AVLNode getLeft() {
+            if (this.isRealNode() && this.left.isRealNode()) {
+                return this.left;
+            }
+            return null;
+        }
+
+        /**
+         * Sets the right child of node, if not virtual, else does nothing.
+         * @param node - Node to set as right node.
+         */
         public void setRight(AVLNode node) {
             if (this.isRealNode()) {
                 this.right = node;
             }
         }
 
-        //returns right child (if there is no right child return null)
-        public AVLNode getRight() {
+        /**
+         * Get the node's right child.
+         * @return - If real node then return right child including virtual, else null.
+         */
+        public AVLNode getRightVirtual() {
             return this.right;
         }
 
-        //sets parent
+        /**
+         * Get the node's left child.
+         * @return - If left child exists return node, else null.
+         */
+        public AVLNode getRight() {
+            if (this.isRealNode() && this.right.isRealNode()) {
+                return this.right;
+            }
+            return null;
+        }
+
+        /**
+         * Sets the parent of node.
+         * @param node - Node to set as parent node.
+         */
         public void setParent(AVLNode node) {
             this.parent = node;
         }
 
-        //returns the parent (if there is no parent return null)
+        /**
+         * Get the node's parent.
+         * @return - If parent exists return node, else null.
+         */
         public AVLNode getParent() {
             return this.parent;
         }
 
-        // Returns True if this is a non-virtual AVL node
+        /**
+         * Checks if this is a virtual node or real node.
+         * @return If real node returns true, else false.
+         */
         public boolean isRealNode() {
             return this.key != -1;
         }
 
-        // sets the height of the node
-        private void updateHeight() {
-            this.height = this.calcHeight();
+        /**
+         * Sets the height of the node.
+         * @param height - New height to set.
+         */
+        public void setHeight(int height) {
+            this.height = height;
         }
 
+        /**
+         * Update the height of the node
+         */
+        private void updateHeight() {
+            setHeight(this.calcHeight());
+        }
+
+        /**
+         * Update the height of the node and return if it was changed.
+         * @return If height changed return 1 else 0.
+         */
         private int updateHeightAndReport() {
             int newHeight = this.calcHeight();
             int oldHeight = this.getHeight();
-            this.height = newHeight;
+            setHeight(newHeight);
             return newHeight == oldHeight ? 0 : 1;
         }
 
+        /**
+         * Calculate the height of the node.
+         * @return - Calculated height of the node.
+         */
         private int calcHeight() {
             if (this.isRealNode()) {
                 return Math.max(this.left.getHeight(), this.right.getHeight()) + 1;
@@ -824,15 +887,33 @@ public class AVLTree {
             return -1;
         }
 
-        // Returns the height of the node (-1 for virtual nodes)
+        /**
+         * Get the height of the node.
+         * @return - Return the height of the node if real node, else -1.
+         */
         public int getHeight() {
             return this.height;
         }
 
-        private void updateBooleanValueSum() {
-            this.booleanValueSum = this.calcBooleanValueSum();
+        /**
+         * Sets the booleanValueSum of the node.
+         * @param booleanValueSum - booleanValueSum to set.
+         */
+        public void setBooleanValueSum(int booleanValueSum) {
+            this.booleanValueSum = booleanValueSum;
         }
 
+        /**
+         * Update the field booleanValueSum.
+         */
+        private void updateBooleanValueSum() {
+            setBooleanValueSum(this.calcBooleanValueSum());
+        }
+
+        /**
+         * Calculate the booleanValueSum of the node.
+         * @return - Calculated booleanValueSum of the node.
+         */
         private int calcBooleanValueSum() {
             if (this.isRealNode()) {
                 int ret = this.left.getBooleanValueSum() + this.right.getBooleanValueSum();
@@ -842,15 +923,26 @@ public class AVLTree {
             return 0;
         }
 
+        /**
+         * Get the booleanValueSum of the node.
+         * @return booleanValueSum of the node.
+         */
         public int getBooleanValueSum() {
             return this.booleanValueSum;
         }
 
+        /**
+         * Update all the field of the node.
+         */
         public void updateFields() {
             this.updateHeight();
             this.updateBooleanValueSum();
         }
 
+        /**
+         * Calculate the balance factor of the node.
+         * @return BF of node.
+         */
         public int getBF() {
             if (this.isRealNode()) {
                 return this.left.getHeight() - this.right.getHeight();
@@ -858,6 +950,9 @@ public class AVLTree {
             return -1;
         }
 
+        /**
+         * Remove all the connections of the node from its parents and its children.
+         */
         public void resetConnections() {
             this.setLeft(new AVLNode(this));
             this.setRight(new AVLNode(this));
@@ -865,5 +960,3 @@ public class AVLTree {
         }
     }
 }
-
-
