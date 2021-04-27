@@ -18,14 +18,14 @@ public class AVLTree {
     private int size;
 
     /**
-     * Create an empty AVLTree object
+     * Create an empty AVLTree object.
      */
     public AVLTree(){
         this.initTree();
     }
 
     /**
-     * Initilize the fields of an empty AVLTree, and overrides them if not empty
+     * Initilize the fields of an empty AVLTree, and overrides them if not empty.
      */
     private void initTree() {
         this.setRoot(new AVLNode());
@@ -35,17 +35,17 @@ public class AVLTree {
     }
 
     /**
-     * Checks if the AVLTree is empty
-     * @return true if tree empty else false
+     * Checks if the AVLTree is empty.
+     * @return true if tree empty else false.
      */
     public boolean empty() {
         return !this.getRootVirtual().isRealNode();
     }
 
     /**
-     * Search for AVLNode object in the AVLTree by key
-     * @param k - key of searched node
-     * @return the searched node if exists, else a virtual node where node should exist
+     * Search for AVLNode object in the AVLTree by key.
+     * @param k - key of searched node.
+     * @return the searched node if exists, else a virtual node where node should exist.
      */
     private AVLNode searchNode(int k) {
         AVLNode node = this.root;
@@ -60,18 +60,18 @@ public class AVLTree {
         return node;
     }
     /**
-     * Searches for a key in the AVLTree
-     * @param k - Key to search
-     * @return if key exists, the return value is the info of the node, else returns null
+     * Searches for a key in the AVLTree.
+     * @param k - Key to search.
+     * @return if key exists, the return value is the info of the node, else returns null.
      */
     public Boolean search(int k) {
         return this.searchNode(k).getValue();
     }
 
     /**
-     * Change the child of a parent from an old child to a different new child
-     * @param oldChild - The current child of the AVLNode
-     * @param newChild - The soon to be new child of the AVLNode
+     * Change the child of a parent from an old child to a different new child.
+     * @param oldChild - The current child of the AVLNode.
+     * @param newChild - The soon to be new child of the AVLNode.
      */
      private void updateParentChild(AVLNode oldChild, AVLNode newChild) {
         AVLNode parent = oldChild.getParent();
@@ -124,8 +124,8 @@ public class AVLTree {
     /**
      * Inserts an item to the AVLTree if key doesn't exists, else does nothing. Also makes sure
      * the tree will remain valid.
-     * @param k - Key to insert to tree
-     * @param i - Value to insert to tree
+     * @param k - Key to insert to tree.
+     * @param i - Value to insert to tree.
      * @return - The number of nodes which require rebalancing operations. This always includes the
      * newly created node. If no node was inserted, then returns -1.
      */
@@ -452,14 +452,14 @@ public class AVLTree {
 
     /**
      * Get the root node of the tree
-     * @return - AVLNode root, including virtual node if tree is empty.
+     * @return - root, including virtual node if tree is empty.
      */
     public AVLNode getRootVirtual() {
         return this.root;
     }
 
     /**
-     * Get the root node of the tree
+     * Get the root node of the tree.
      * @return - if tree in not empty then AVLNode root, else null.
      */
     public AVLNode getRoot() {
@@ -469,18 +469,34 @@ public class AVLTree {
         return this.getRootVirtual();
     }
 
+    /**
+     * Set the root of the tree.
+     * @param root - Node to set as root
+     */
     private void setRoot(AVLNode root) {
         this.root = root;
     }
 
+    /**
+     * Get the min node of the tree.
+     * @return - Min node, including virtual node if tree is empty.
+     */
     public AVLNode getMin() {
         return this.minNode;
     }
 
+    /**
+     * Set the minimum node of the tree
+     * @param node - Node to set as min.
+     */
     private void setMin(AVLNode node) {
         this.minNode = node;
     }
 
+    /**
+     * Get the minimum node of the tree by calculation.
+     * @return - Min node, including virtual node if tree is empty.
+     */
     private AVLNode calcMin() {
         AVLNode newMin = this.getRootVirtual();
         if (!this.empty()) {
@@ -493,14 +509,26 @@ public class AVLTree {
         return newMin;
     }
 
+    /**
+     * Get the max node of the tree.
+     * @return - Max node, including virtual node if tree is empty.
+     */
     public AVLNode getMax() {
         return this.maxNode;
     }
 
+    /**
+     * Set the maximum node of the tree
+     * @param node - Node to set as max.
+     */
     private void setMax(AVLNode node) {
         this.maxNode = node;
     }
 
+    /**
+     * Get the maximum node of the tree by calculation.
+     * @return - Max node, including virtual node if tree is empty.
+     */
     private AVLNode calcMax() {
         AVLNode newMax = this.getRootVirtual();
         if (!this.empty()) {
@@ -513,35 +541,53 @@ public class AVLTree {
         return newMax;
     }
 
+    /**
+     * Set the size of the tree.
+     * @param size - New size of tree.
+     */
     private void setSize(int size) {
         this.size = size;
     }
 
+    /**
+     * Increase the size of the tree by one.
+     */
     private void incrementSize() {
         this.setSize(this.getSize() + 1);
     }
 
+    /**
+     * Decrease the size of the tree by one.
+     */
     private void decrementSize() {
         this.setSize(this.getSize() - 1);
     }
 
+    /**
+     * Get the size of the tree
+     * @return - size of tree.
+     */
     public int getSize() {
         return this.size;
     }
 
+    /**
+     * Get the sum of true appearing in the node itself plus the sum of all of its descendants to its left.
+     * @param node
+     * @return
+     */
     private int calcLeftBooleanValueSum(AVLNode node) {
         int ret = node.getLeft().getBooleanValueSum();
         ret += node.getValue().booleanValue() ? 1 : 0;
         return ret;
     }
+
     /**
-     * public boolean prefixXor(int k)
-     *
-     * Given an argument k which is a key in the tree, calculate the xor of the values of nodes whose keys are
-     * smaller or equal to k.
-     *
-     * precondition: this.search(k) != null
-     *
+     * Given a key in the tree, calculate the xor of the values of nodes whose keys are smaller
+     * or equal to k.
+     * @pre - this.search(k) != null
+     * @param k - key in tree
+     * @return - xor value of all k's predeceasing keys, including itself.
      */
     public boolean prefixXor(int k){
         AVLNode node = this.searchNode(k);
@@ -557,6 +603,11 @@ public class AVLTree {
         return (booleanValueSum % 2 == 1);
     }
 
+    /**
+     * Get the successor of a node in the tree, given that the node has a right child.
+     * @param node - Node to get its successor.
+     * @return - Successor node.
+     */
     private AVLNode successorChild(AVLNode node) {
         node = node.getRight();
         while (node.isRealNode()) {
@@ -565,6 +616,11 @@ public class AVLTree {
         return node.getParent();
     }
 
+    /**
+     * Get the successor of a node in the tree, given that the node doesn't have a right child.
+     * @param node - Node to get its successor.
+     * @return - Successor node if exists, else null.
+     */
     private AVLNode successorParent(AVLNode node) {
         AVLNode next = node.getParent();
         while (next != null && next.getLeft() != node) {
@@ -575,21 +631,22 @@ public class AVLTree {
     }
 
     /**
-     * public AVLNode successor
-     *
-     * given a node 'node' in the tree, return the successor of 'node' in the tree (or null if successor doesn't exist)
-     *
-     * @param node - the node whose successor should be returned
-     * @return the successor of 'node' if exists, null otherwise
+     * Given a node in the tree, return the successor of the node.
+     * @param node - Node to get its successor.
+     * @return - Successor node if exists, else null.
      */
     public AVLNode successor(AVLNode node) {
         if (node.getRight().isRealNode()) {
             return successorChild(node);
         }
         return successorParent(node);
-
     }
 
+    /**
+     * Get the predecessor of a node in the tree, given that the node has a left child.
+     * @param node - Node to get its predecessor.
+     * @return - Predecessor node.
+     */
     private AVLNode predecessorChild(AVLNode node) {
         node = node.getLeft();
         while (node.isRealNode()) {
@@ -598,6 +655,11 @@ public class AVLTree {
         return node.getParent();
     }
 
+    /**
+     * Get the predecessor of a node in the tree, given that the node doesn't have a left child.
+     * @param node - Node to get its successor.
+     * @return - Predecessor node if exists, else null.
+     */
     private AVLNode predecessorParent(AVLNode node) {
         AVLNode next = node.getParent();
         while (next != null && next.getRight() != node) {
@@ -607,6 +669,11 @@ public class AVLTree {
         return next;
     }
 
+    /**
+     * Get the predecessor of a node in the tree.
+     * @param node - Node to get its successor.
+     * @return - Predecessor node if exists, else null.
+     */
     public AVLNode predecessor(AVLNode node) {
         if (node.getLeft().isRealNode()) {
             return predecessorChild(node);
@@ -615,13 +682,11 @@ public class AVLTree {
     }
 
     /**
-     * public boolean succPrefixXor(int k)
-     *
-     * This function is identical to prefixXor(int k) in terms of input/output. However, the implementation of
-     * succPrefixXor should be the following: starting from the minimum-key node, iteratively call successor until
-     * you reach the node of key k. Return the xor of all visited nodes.
-     *
-     * precondition: this.search(k) != null
+     * Identical to prefixXor. However, the implementation of succPrefixXor is starting from the
+     * minimum-key node, iteratively call successor until you reach the node of specified key.
+     * @pre - this.search(k) != null
+     * @param k - key in tree
+     * @return - xor value of all k's predeceasing keys, including itself.
      */
     public boolean succPrefixXor(int k){
         AVLNode node = this.getMin();
