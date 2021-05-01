@@ -712,7 +712,7 @@ public class AVLTree {
         private int height;
         private int booleanValueSum;
 
-        public AVLNode(int key, Boolean value) {
+        private AVLNode(int key, Boolean value) {
             this.setKey(key);
             this.setValue(value);
             this.setLeft(new AVLNode(this));
@@ -721,12 +721,12 @@ public class AVLTree {
             this.updateFields();
         }
 
-        public AVLNode(int key, Boolean value, AVLNode parent) {
+        private AVLNode(int key, Boolean value, AVLNode parent) {
             this(key, value);
             this.setParent(parent);
         }
 
-        public AVLNode() {
+        private AVLNode() {
             this.setKey(-1);
             this.setValue(null);
             this.setLeft(null);
@@ -735,7 +735,7 @@ public class AVLTree {
             this.updateFields();
         }
 
-        public AVLNode(AVLNode parent) {
+        private AVLNode(AVLNode parent) {
             this();
             this.setParent(parent);
         }
@@ -776,7 +776,7 @@ public class AVLTree {
          * Sets the left child of node, if not virtual, else does nothing.
          * @param node - Node to set as left node.
          */
-        public void setLeft(AVLNode node) {
+        private void setLeft(AVLNode node) {
             if (this.isRealNode()) {
                 this.left = node;
             }
@@ -805,7 +805,7 @@ public class AVLTree {
          * Sets the right child of node, if not virtual, else does nothing.
          * @param node - Node to set as right node.
          */
-        public void setRight(AVLNode node) {
+        private void setRight(AVLNode node) {
             if (this.isRealNode()) {
                 this.right = node;
             }
@@ -834,7 +834,7 @@ public class AVLTree {
          * Sets the parent of node.
          * @param node - Node to set as parent node.
          */
-        public void setParent(AVLNode node) {
+        private void setParent(AVLNode node) {
             this.parent = node;
         }
 
@@ -858,7 +858,7 @@ public class AVLTree {
          * Sets the height of the node.
          * @param height - New height to set.
          */
-        public void setHeight(int height) {
+        private void setHeight(int height) {
             this.height = height;
         }
 
@@ -903,7 +903,7 @@ public class AVLTree {
          * Sets the booleanValueSum of the node.
          * @param booleanValueSum - booleanValueSum to set.
          */
-        public void setBooleanValueSum(int booleanValueSum) {
+        private void setBooleanValueSum(int booleanValueSum) {
             this.booleanValueSum = booleanValueSum;
         }
 
@@ -931,14 +931,14 @@ public class AVLTree {
          * Get the booleanValueSum of the node.
          * @return booleanValueSum of the node.
          */
-        public int getBooleanValueSum() {
+        private int getBooleanValueSum() {
             return this.booleanValueSum;
         }
 
         /**
          * Update all the field of the node.
          */
-        public void updateFields() {
+        private void updateFields() {
             this.updateHeight();
             this.updateBooleanValueSum();
         }
@@ -957,7 +957,7 @@ public class AVLTree {
         /**
          * Remove all the connections of the node from its parents and its children.
          */
-        public void resetConnections() {
+        private void resetConnections() {
             this.setLeft(new AVLNode(this));
             this.setRight(new AVLNode(this));
             this.setParent(null);
