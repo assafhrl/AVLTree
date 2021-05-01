@@ -22,9 +22,10 @@ public class AVLTree {
      * Initilize the fields of an empty AVLTree, and overrides them if not empty.
      */
     private void initTree() {
-        this.setRoot(new AVLNode());
-        this.setMin(this.getRootVirtual());
-        this.setMax(this.getRootVirtual());
+        AVLNode newRoot = new AVLNode();
+        this.setRoot(newRoot);
+        this.setMin(newRoot);
+        this.setMax(newRoot);
         this.setSize(0);
     }
 
