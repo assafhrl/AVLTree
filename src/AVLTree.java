@@ -688,7 +688,7 @@ public class AVLTree {
     public boolean succPrefixXor(int k){
         AVLNode node = this.getMin();
         int trueCounter = 0;
-        while (node.getKey() <= k) {
+        while (node != null && node.getKey() <= k) {
             trueCounter += node.getValue().booleanValue() ? 1 : 0;
             node = this.successor(node);
         }
