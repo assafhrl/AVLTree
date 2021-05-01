@@ -64,6 +64,85 @@ public class AVLTree {
     }
 
     /**
+     * Checks the path from given node to root. Updates fields of nodes on the path and performs
+     * rebalancing operations if needed.
+     * @param node - Starting node to check path from it to root node.
+     * @return - The number of rebalancing operations.
+     */
+    private int updatePath(AVLNode node) {
+        int ops = 0;
+        while (node != null) {
+            if (rotate(node)) {
+                ops += 1;
+                node = node.getParent();
+                node.getLeftVirtual().updateFields();
+                node.getRightVirtual().updateFields();
+                node.updateFields();
+            } else {
+                ops += node.updateHeightAndReport();
+                node.updateBooleanValueSum();
+            }
+            node = node.getParent();
+        }
+        return ops;
+    }
+
+    /**
+     * Checks if the node is out of balance by calculation the balance factor, and deciding, if nessecery,
+     * which set of ratations should take place
+     * @param node - The node to check if it's out of balance.
+     * @return - true if a rotation has taken place, else false.
+     */
+    private boolean rotate(AVLNode node) {
+        int bf = node.getBF();
+        if (bf >= -1 && bf <= 1) {
+            return false;
+        }
+        if (bf < 0) {
+           int rightBF = node.getRightVirtual().getBF();
+           if (rightBF > 0) {
+               this.rotateRight(node.getRightVirtual());
+           }
+           this.rotateLeft(node);
+        } else {
+            int leftBF = node.getLeftVirtual().getBF();
+            if (leftBF < 0) {
+                this.rotateLeft(node.getLeftVirtual());
+            }
+            this.rotateRight(node);
+        }
+        return true;
+    }
+
+    /**
+     * Perform a left rotation on a node.
+     * @param node - The root node to perform a left rotation on.
+     */
+    private void rotateLeft(AVLNode node) {
+        AVLNode right = node.getRightVirtual();
+        AVLNode rightLeft = right.getLeftVirtual();
+        updateParentChild(node, right);
+        node.setRight(rightLeft);
+        rightLeft.setParent(node);
+        right.setLeft(node);
+        node.setParent(right);
+    }
+
+    /**
+     * Perform a right rotation on a node.
+     * @param node
+     */
+    private void rotateRight(AVLNode node) {
+        AVLNode left = node.getLeftVirtual();
+        AVLNode leftRight = left.getRightVirtual();
+        updateParentChild(node, left);
+        node.setLeft(leftRight);
+        leftRight.setParent(node);
+        left.setRight(node);
+        node.setParent(left);
+    }
+
+    /**
      * Change the child of a parent from an old child to a different new child.
      * @param oldChild - The current child of the AVLNode.
      * @param newChild - The soon to be new child of the AVLNode.
@@ -80,40 +159,6 @@ public class AVLTree {
             parent.setRight(newChild);
         }
         newChild.setParent(parent);
-    }
-
-    /**
-     * Checks if there is a need to change the pointer to the minimum node while performing an
-     * insertion operation. If so, then updates the pointer.
-     * @param node - Node to check if should be new minimum.
-     */
-    private void updateMinInsert(AVLNode node) {
-        AVLNode currentMin = this.getMin();
-        if (!currentMin.isRealNode() || node.getKey() < currentMin.getKey()) {
-            this.setMin(node);
-        }
-    }
-
-    /**
-     * Checks if there is a need to change the pointer to the maximum node while performing an
-     * insertion operation. If so, then updates the pointer.
-     * @param node - Node to check if should be new maximum.
-     */
-    private void  updateMaxInsert(AVLNode node) {
-        AVLNode currentMax = this.getMax();
-        if (!currentMax.isRealNode() || node.getKey() > this.getMax().getKey()) {
-            this.setMax(node);
-        }
-    }
-
-    /**
-     * Checks if there is a need to change the pointer to the maximum and or minimum node while
-     * performing an insertion operation. If so, then updates the pointer.
-     * @param node - Node to check if should be new minimum and maximum.
-     */
-    private void updateMinMaxInsert(AVLNode node) {
-        updateMinInsert(node);
-        updateMaxInsert(node);
     }
 
     /**
@@ -151,27 +196,37 @@ public class AVLTree {
     }
 
     /**
-     * Checks the path from given node to root. Updates fields of nodes on the path and performs
-     * rebalancing operations if needed.
-     * @param node - Starting node to check path from it to root node.
-     * @return - The number of rebalancing operations.
+     * Checks if there is a need to change the pointer to the minimum node while performing an
+     * insertion operation. If so, then updates the pointer.
+     * @param node - Node to check if should be new minimum.
      */
-    private int updatePath(AVLNode node) {
-        int ops = 0;
-        while (node != null) {
-            if (rotate(node)) {
-                ops += 1;
-                node = node.getParent();
-                node.getLeftVirtual().updateFields();
-                node.getRightVirtual().updateFields();
-                node.updateFields();
-            } else {
-                ops += node.updateHeightAndReport();
-                node.updateBooleanValueSum();
-            }
-            node = node.getParent();
+    private void updateMinInsert(AVLNode node) {
+        AVLNode currentMin = this.getMin();
+        if (!currentMin.isRealNode() || node.getKey() < currentMin.getKey()) {
+            this.setMin(node);
         }
-        return ops;
+    }
+
+    /**
+     * Checks if there is a need to change the pointer to the maximum node while performing an
+     * insertion operation. If so, then updates the pointer.
+     * @param node - Node to check if should be new maximum.
+     */
+    private void  updateMaxInsert(AVLNode node) {
+        AVLNode currentMax = this.getMax();
+        if (!currentMax.isRealNode() || node.getKey() > this.getMax().getKey()) {
+            this.setMax(node);
+        }
+    }
+
+    /**
+     * Checks if there is a need to change the pointer to the maximum and or minimum node while
+     * performing an insertion operation. If so, then updates the pointer.
+     * @param node - Node to check if should be new minimum and maximum.
+     */
+    private void updateMinMaxInsert(AVLNode node) {
+        updateMinInsert(node);
+        updateMaxInsert(node);
     }
 
     /**
@@ -294,16 +349,6 @@ public class AVLTree {
     }
 
     /**
-     * Checks if there is a need to change the pointer to the maximum and or minimum node while
-     * performing a deletion operation. If so, then updates the pointer.
-     * @param node - Deleted node to check if it were previously minimum or maximum.
-     */
-    private void updateMinMaxDelete(AVLNode node) {
-        updateMinDelete(node);
-        updateMaxDelete(node);
-    }
-
-    /**
      * Checks if there is a need to change the pointer to the  minimum node while
      * performing a deletion operation. If so, then updates the pointer.
      * @param node - Deleted node to check if it were previously minimum.
@@ -330,58 +375,140 @@ public class AVLTree {
     }
 
     /**
-     * Checks if the node is out of balance by calculation the balance factor, and deciding, if nessecery,
-     * which set of ratations should take place
-     * @param node - The node to check if it's out of balance.
-     * @return - true if a rotation has taken place, else false.
+     * Checks if there is a need to change the pointer to the maximum and or minimum node while
+     * performing a deletion operation. If so, then updates the pointer.
+     * @param node - Deleted node to check if it were previously minimum or maximum.
      */
-    private boolean rotate(AVLNode node) {
-        int bf = node.getBF();
-        if (bf >= -1 && bf <= 1) {
-            return false;
-        }
-        if (bf < 0) {
-           int rightBF = node.getRightVirtual().getBF();
-           if (rightBF > 0) {
-               this.rotateRight(node.getRightVirtual());
-           }
-           this.rotateLeft(node);
-        } else {
-            int leftBF = node.getLeftVirtual().getBF();
-            if (leftBF < 0) {
-                this.rotateLeft(node.getLeftVirtual());
-            }
-            this.rotateRight(node);
-        }
-        return true;
+    private void updateMinMaxDelete(AVLNode node) {
+        updateMinDelete(node);
+        updateMaxDelete(node);
     }
 
     /**
-     * Perform a left rotation on a node.
-     * @param node - The root node to perform a left rotation on.
-     */
-    private void rotateLeft(AVLNode node) {
-        AVLNode right = node.getRightVirtual();
-        AVLNode rightLeft = right.getLeftVirtual();
-        updateParentChild(node, right);
-        node.setRight(rightLeft);
-        rightLeft.setParent(node);
-        right.setLeft(node);
-        node.setParent(right);
-    }
-
-    /**
-     * Perform a right rotation on a node.
+     * Get the sum of true appearing in the node itself plus the sum of all of its descendants to its left.
      * @param node
+     * @return
      */
-    private void rotateRight(AVLNode node) {
-        AVLNode left = node.getLeftVirtual();
-        AVLNode leftRight = left.getRightVirtual();
-        updateParentChild(node, left);
-        node.setLeft(leftRight);
-        leftRight.setParent(node);
-        left.setRight(node);
-        node.setParent(left);
+    private int calcLeftBooleanValueSum(AVLNode node) {
+        int ret = node.getLeftVirtual().getBooleanValueSum();
+        ret += node.getValue().booleanValue() ? 1 : 0;
+        return ret;
+    }
+
+    /**
+     * Given a key in the tree, calculate the xor of the values of nodes whose keys are smaller
+     * or equal to k.
+     * @pre - this.search(k) != null
+     * @param k - key in tree
+     * @return - xor value of all k's predeceasing keys, including itself.
+     */
+    public boolean prefixXor(int k){
+        AVLNode node = this.searchNode(k);
+        int booleanValueSum = calcLeftBooleanValueSum(node);
+        AVLNode next = node.getParent();
+        while (next != null) {
+            if (node == next.getRightVirtual()) {
+                booleanValueSum += calcLeftBooleanValueSum(next);
+            }
+            node = next;
+            next = node.getParent();
+        }
+        return (booleanValueSum % 2 == 1);
+    }
+
+    /**
+     * Identical to prefixXor. However, the implementation of succPrefixXor is starting from the
+     * minimum-key node, iteratively call successor until you reach the node of specified key.
+     * @pre - this.search(k) != null
+     * @param k - key in tree
+     * @return - xor value of all k's predeceasing keys, including itself.
+     */
+    public boolean succPrefixXor(int k){
+        AVLNode node = this.getMin();
+        int trueCounter = 0;
+        while (node != null && node.getKey() <= k) {
+            trueCounter += node.getValue().booleanValue() ? 1 : 0;
+            node = this.successor(node);
+        }
+        return (trueCounter % 2) == 1;
+    }
+
+    /**
+     * Get the successor of a node in the tree, given that the node has a right child.
+     * @param node - Node to get its successor.
+     * @return - Successor node.
+     */
+    private AVLNode successorChild(AVLNode node) {
+        node = node.getRightVirtual();
+        while (node.isRealNode()) {
+            node = node.getLeftVirtual();
+        }
+        return node.getParent();
+    }
+
+    /**
+     * Get the successor of a node in the tree, given that the node doesn't have a right child.
+     * @param node - Node to get its successor.
+     * @return - Successor node if exists, else null.
+     */
+    private AVLNode successorParent(AVLNode node) {
+        AVLNode next = node.getParent();
+        while (next != null && next.getLeftVirtual() != node) {
+            node = next;
+            next = node.getParent();
+        }
+        return next;
+    }
+
+    /**
+     * Given a node in the tree, return the successor of the node.
+     * @param node - Node to get its successor.
+     * @return - Successor node if exists, else null.
+     */
+    public AVLNode successor(AVLNode node) {
+        if (node.getRightVirtual().isRealNode()) {
+            return successorChild(node);
+        }
+        return successorParent(node);
+    }
+
+    /**
+     * Get the predecessor of a node in the tree, given that the node has a left child.
+     * @param node - Node to get its predecessor.
+     * @return - Predecessor node.
+     */
+    private AVLNode predecessorChild(AVLNode node) {
+        node = node.getLeftVirtual();
+        while (node.isRealNode()) {
+            node = node.getRightVirtual();
+        }
+        return node.getParent();
+    }
+
+    /**
+     * Get the predecessor of a node in the tree, given that the node doesn't have a left child.
+     * @param node - Node to get its successor.
+     * @return - Predecessor node if exists, else null.
+     */
+    private AVLNode predecessorParent(AVLNode node) {
+        AVLNode next = node.getParent();
+        while (next != null && next.getRightVirtual() != node) {
+            node = next;
+            next = node.getParent();
+        }
+        return next;
+    }
+
+    /**
+     * Get the predecessor of a node in the tree.
+     * @param node - Node to get its successor.
+     * @return - Predecessor node if exists, else null.
+     */
+    public AVLNode predecessor(AVLNode node) {
+        if (node.getLeftVirtual().isRealNode()) {
+            return predecessorChild(node);
+        }
+        return predecessorParent(node);
     }
 
     /**
@@ -567,133 +694,6 @@ public class AVLTree {
      */
     public int getSize() {
         return this.size;
-    }
-
-    /**
-     * Get the sum of true appearing in the node itself plus the sum of all of its descendants to its left.
-     * @param node
-     * @return
-     */
-    private int calcLeftBooleanValueSum(AVLNode node) {
-        int ret = node.getLeftVirtual().getBooleanValueSum();
-        ret += node.getValue().booleanValue() ? 1 : 0;
-        return ret;
-    }
-
-    /**
-     * Given a key in the tree, calculate the xor of the values of nodes whose keys are smaller
-     * or equal to k.
-     * @pre - this.search(k) != null
-     * @param k - key in tree
-     * @return - xor value of all k's predeceasing keys, including itself.
-     */
-    public boolean prefixXor(int k){
-        AVLNode node = this.searchNode(k);
-        int booleanValueSum = calcLeftBooleanValueSum(node);
-        AVLNode next = node.getParent();
-        while (next != null) {
-            if (node == next.getRightVirtual()) {
-                booleanValueSum += calcLeftBooleanValueSum(next);
-            }
-            node = next;
-            next = node.getParent();
-        }
-        return (booleanValueSum % 2 == 1);
-    }
-
-    /**
-     * Get the successor of a node in the tree, given that the node has a right child.
-     * @param node - Node to get its successor.
-     * @return - Successor node.
-     */
-    private AVLNode successorChild(AVLNode node) {
-        node = node.getRightVirtual();
-        while (node.isRealNode()) {
-            node = node.getLeftVirtual();
-        }
-        return node.getParent();
-    }
-
-    /**
-     * Get the successor of a node in the tree, given that the node doesn't have a right child.
-     * @param node - Node to get its successor.
-     * @return - Successor node if exists, else null.
-     */
-    private AVLNode successorParent(AVLNode node) {
-        AVLNode next = node.getParent();
-        while (next != null && next.getLeftVirtual() != node) {
-            node = next;
-            next = node.getParent();
-        }
-        return next;
-    }
-
-    /**
-     * Given a node in the tree, return the successor of the node.
-     * @param node - Node to get its successor.
-     * @return - Successor node if exists, else null.
-     */
-    public AVLNode successor(AVLNode node) {
-        if (node.getRightVirtual().isRealNode()) {
-            return successorChild(node);
-        }
-        return successorParent(node);
-    }
-
-    /**
-     * Get the predecessor of a node in the tree, given that the node has a left child.
-     * @param node - Node to get its predecessor.
-     * @return - Predecessor node.
-     */
-    private AVLNode predecessorChild(AVLNode node) {
-        node = node.getLeftVirtual();
-        while (node.isRealNode()) {
-            node = node.getRightVirtual();
-        }
-        return node.getParent();
-    }
-
-    /**
-     * Get the predecessor of a node in the tree, given that the node doesn't have a left child.
-     * @param node - Node to get its successor.
-     * @return - Predecessor node if exists, else null.
-     */
-    private AVLNode predecessorParent(AVLNode node) {
-        AVLNode next = node.getParent();
-        while (next != null && next.getRightVirtual() != node) {
-            node = next;
-            next = node.getParent();
-        }
-        return next;
-    }
-
-    /**
-     * Get the predecessor of a node in the tree.
-     * @param node - Node to get its successor.
-     * @return - Predecessor node if exists, else null.
-     */
-    public AVLNode predecessor(AVLNode node) {
-        if (node.getLeftVirtual().isRealNode()) {
-            return predecessorChild(node);
-        }
-        return predecessorParent(node);
-    }
-
-    /**
-     * Identical to prefixXor. However, the implementation of succPrefixXor is starting from the
-     * minimum-key node, iteratively call successor until you reach the node of specified key.
-     * @pre - this.search(k) != null
-     * @param k - key in tree
-     * @return - xor value of all k's predeceasing keys, including itself.
-     */
-    public boolean succPrefixXor(int k){
-        AVLNode node = this.getMin();
-        int trueCounter = 0;
-        while (node != null && node.getKey() <= k) {
-            trueCounter += node.getValue().booleanValue() ? 1 : 0;
-            node = this.successor(node);
-        }
-        return (trueCounter % 2) == 1;
     }
 
 
