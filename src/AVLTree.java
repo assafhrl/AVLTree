@@ -23,8 +23,8 @@ public class AVLTree {
      */
     private void initTree() {
         this.setRoot(new AVLNode());
-        this.setMin(new AVLNode());
-        this.setMax(new AVLNode());
+        this.setMin(this.getRootVirtual());
+        this.setMax(this.getRootVirtual());
         this.setSize(0);
     }
 
@@ -185,9 +185,12 @@ public class AVLTree {
             return -1;
         }
         AVLNode updatePathStartNode = this.deleteNode(nodeLoc);
-        this.decrementSize();
-        int ops = updatePath(updatePathStartNode) + 1;
-        updateMinMaxDelete(nodeLoc);
+        int ops = 1;
+        if (!this.empty()) {
+            this.decrementSize();
+            ops += updatePath(updatePathStartNode);
+            updateMinMaxDelete(nodeLoc);
+        }
         return ops;
     }
 
@@ -318,7 +321,7 @@ public class AVLTree {
      * @param node - Deleted node to check if it were previously maximum.
      */
     private void updateMaxDelete(AVLNode node) {
-        AVLNode currentMax = this.getMin();
+        AVLNode currentMax = this.getMax();
         if (currentMax == node) {
             AVLNode newMax = calcMax();
             this.setMax(newMax);
@@ -589,7 +592,7 @@ public class AVLTree {
         AVLNode next = node.getParent();
         while (next != null) {
             if (node == next.getRightVirtual()) {
-                booleanValueSum += calcLeftBooleanValueSum(node);
+                booleanValueSum += calcLeftBooleanValueSum(next);
             }
             node = next;
             next = node.getParent();
