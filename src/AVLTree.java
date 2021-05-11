@@ -19,7 +19,7 @@ public class AVLTree {
     }
 
     /**
-     * Initilize the fields of an empty AVLTree, and overrides them if not empty.
+     * Initialize the fields of an empty AVLTree, and overrides them if not empty.
      */
     private void initTree() {
         AVLNode newRoot = new AVLNode();
@@ -77,19 +77,16 @@ public class AVLTree {
                 node = node.getParent();
                 node.getLeftVirtual().updateFields();
                 node.getRightVirtual().updateFields();
-                node.updateFields();
-            } else {
-                ops += node.updateHeightAndReport();
-                node.updateBooleanValueSum();
             }
+            node.updateFields();
             node = node.getParent();
         }
         return ops;
     }
 
     /**
-     * Checks if the node is out of balance by calculation the balance factor, and deciding, if nessecery,
-     * which set of ratations should take place
+     * Checks if the node is out of balance by calculation the balance factor, and deciding, if necessary,
+     * which set of rotations should take place
      * @param node - The node to check if it's out of balance.
      * @return - true if a rotation has taken place, else false.
      */
@@ -130,7 +127,7 @@ public class AVLTree {
 
     /**
      * Perform a right rotation on a node.
-     * @param node
+     * @param node - The root node to perform a right rotation on.
      */
     private void rotateRight(AVLNode node) {
         AVLNode left = node.getLeftVirtual();
@@ -176,7 +173,7 @@ public class AVLTree {
         }
         this.incrementSize();
         int ops = this.updatePath(node) + 1;
-        updateMinMaxInsert(node);
+        this.updateMinMaxInsert(node);
         return ops;
     }
 
@@ -254,7 +251,7 @@ public class AVLTree {
      * Bypass the connection through a node from the parent to child nodes.
      * @param node - Node to bypass and remove from tree.
      * @param parent - node object parent
-     * @param child - node object child to conect to parent
+     * @param child - node object child to connect to parent
      */
     private void disconnectNode(AVLNode node, AVLNode parent, AVLNode child) {
         if (parent.getLeftVirtual() == node) {
@@ -286,7 +283,7 @@ public class AVLTree {
     /**
      * Perform a physical delete operation from the tree when the node has a single child.
      * @param node - The node to physically delete from the tree.
-     * @param child - The single child of the node to bypass the conection from parent to child.
+     * @param child - The single child of the node to bypass the connection from parent to child.
      * @return - node to start checking path from while performing the rebalancing operations.
      */
     private AVLNode deleteNodeSingleChild(AVLNode node, AVLNode child) {
@@ -386,8 +383,8 @@ public class AVLTree {
 
     /**
      * Get the sum of true appearing in the node itself plus the sum of all of its descendants to its left.
-     * @param node
-     * @return
+     * @param node - the which we perform the calculation for.
+     * @return - the sum of true in the the sub tree that start at node and includes all its left descendants.
      */
     private int calcLeftBooleanValueSum(AVLNode node) {
         int ret = node.getLeftVirtual().getBooleanValueSum();
@@ -721,11 +718,6 @@ public class AVLTree {
             this.updateFields();
         }
 
-        private AVLNode(int key, Boolean value, AVLNode parent) {
-            this(key, value);
-            this.setParent(parent);
-        }
-
         private AVLNode() {
             this.setKey(-1);
             this.setValue(null);
@@ -867,17 +859,6 @@ public class AVLTree {
          */
         private void updateHeight() {
             setHeight(this.calcHeight());
-        }
-
-        /**
-         * Update the height of the node and return if it was changed.
-         * @return If height changed return 1 else 0.
-         */
-        private int updateHeightAndReport() {
-            int newHeight = this.calcHeight();
-            int oldHeight = this.getHeight();
-            setHeight(newHeight);
-            return newHeight == oldHeight ? 0 : 1;
         }
 
         /**
