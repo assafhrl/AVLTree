@@ -1,3 +1,5 @@
+package messurments;
+
 import java.util.Random;
 
 public class PrefixXor {
