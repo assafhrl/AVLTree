@@ -13,6 +13,7 @@ public class AVLTree {
 
     /**
      * Create an empty AVLTree object.
+     * @complexity O(1)
      */
     public AVLTree(){
         this.initTree();
@@ -20,6 +21,7 @@ public class AVLTree {
 
     /**
      * Initialize the fields of an empty AVLTree, and overrides them if not empty.
+     * @complexity O(1)
      */
     private void initTree() {
         AVLNode newRoot = new AVLNode();
@@ -32,6 +34,7 @@ public class AVLTree {
     /**
      * Checks if the AVLTree is empty.
      * @return true if tree empty else false.
+     * @complexity O(1)
      */
     public boolean empty() {
         return !this.getRootVirtual().isRealNode();
@@ -41,6 +44,7 @@ public class AVLTree {
      * Search for AVLNode object in the AVLTree by key.
      * @param k - key of searched node.
      * @return the searched node if exists, else a virtual node where node should exist.
+     * @complexity O(log n); n number of nodes in tree
      */
     private AVLNode searchNode(int k) {
         AVLNode node = this.root;
@@ -58,6 +62,7 @@ public class AVLTree {
      * Searches for a key in the AVLTree.
      * @param k - Key to search.
      * @return if key exists, the return value is the info of the node, else returns null.
+     * @complexity O(log n); n number of nodes in tree
      */
     public Boolean search(int k) {
         return this.searchNode(k).getValue();
@@ -68,6 +73,7 @@ public class AVLTree {
      * rebalancing operations if needed.
      * @param node - Starting node to check path from it to root node.
      * @return - The number of rebalancing operations.
+     * @complexity O(log n); n number of nodes in tree
      */
     private int updatePath(AVLNode node) {
         int ops = 0;
@@ -89,6 +95,7 @@ public class AVLTree {
      * which set of rotations should take place
      * @param node - The node to check if it's out of balance.
      * @return - true if a rotation has taken place, else false.
+     * @complexity O(1)
      */
     private boolean rotate(AVLNode node) {
         int bf = node.getBF();
@@ -114,6 +121,7 @@ public class AVLTree {
     /**
      * Perform a left rotation on a node.
      * @param node - The root node to perform a left rotation on.
+     * @complexity O(1)
      */
     private void rotateLeft(AVLNode node) {
         AVLNode right = node.getRightVirtual();
@@ -128,6 +136,7 @@ public class AVLTree {
     /**
      * Perform a right rotation on a node.
      * @param node - The root node to perform a right rotation on.
+     * @complexity O(1)
      */
     private void rotateRight(AVLNode node) {
         AVLNode left = node.getLeftVirtual();
@@ -143,6 +152,7 @@ public class AVLTree {
      * Change the child of a parent from an old child to a different new child.
      * @param oldChild - The current child of the AVLNode.
      * @param newChild - The soon to be new child of the AVLNode.
+     * @complexity O(1)
      */
      private void updateParentChild(AVLNode oldChild, AVLNode newChild) {
         AVLNode parent = oldChild.getParent();
@@ -165,6 +175,7 @@ public class AVLTree {
      * @param i - Value to insert to tree.
      * @return - The number of nodes which require rebalancing operations. This always includes the
      * newly created node. If no node was inserted, then returns -1.
+     * @complexity O(log n); n number of nodes in tree
      */
     public int insert(int k, boolean i) {
         AVLNode node = new AVLNode(k, new Boolean(i));
@@ -181,6 +192,7 @@ public class AVLTree {
      * Insert the physical AVLNode into the AVLTree if key doesn't exists.
      * @param node - The node to insert into the tree.
      * @return true if insertion has taken place, else false.
+     * @complexity O(log n); n number of nodes in tree
      */
     private boolean insertNode(AVLNode node) {
         AVLNode nodeLoc = this.searchNode(node.getKey());
@@ -196,6 +208,7 @@ public class AVLTree {
      * Checks if there is a need to change the pointer to the minimum node while performing an
      * insertion operation. If so, then updates the pointer.
      * @param node - Node to check if should be new minimum.
+     * @complexity O(1)
      */
     private void updateMinInsert(AVLNode node) {
         AVLNode currentMin = this.getMin();
@@ -208,6 +221,7 @@ public class AVLTree {
      * Checks if there is a need to change the pointer to the maximum node while performing an
      * insertion operation. If so, then updates the pointer.
      * @param node - Node to check if should be new maximum.
+     * @complexity O(1)
      */
     private void  updateMaxInsert(AVLNode node) {
         AVLNode currentMax = this.getMax();
@@ -220,6 +234,7 @@ public class AVLTree {
      * Checks if there is a need to change the pointer to the maximum and or minimum node while
      * performing an insertion operation. If so, then updates the pointer.
      * @param node - Node to check if should be new minimum and maximum.
+     * @complexity O(1)
      */
     private void updateMinMaxInsert(AVLNode node) {
         updateMinInsert(node);
@@ -231,6 +246,7 @@ public class AVLTree {
      * @param k - The key to delete from the AVLTree.
      * @return - If key exists, then returns the number of rebalancing operations needed to perform,
      * else -1.
+     * @complexity O(log n); n number of nodes in tree
      */
     public int delete(int k) {
         AVLNode nodeLoc = this.searchNode(k);
@@ -252,6 +268,7 @@ public class AVLTree {
      * @param node - Node to bypass and remove from tree.
      * @param parent - node object parent
      * @param child - node object child to connect to parent
+     * @complexity O(1)
      */
     private void disconnectNode(AVLNode node, AVLNode parent, AVLNode child) {
         if (parent.getLeftVirtual() == node) {
@@ -268,6 +285,7 @@ public class AVLTree {
      * Perform a physical delete operation from the tree when the node is a leaf.
      * @param node - Leaf node to physically delete from the tree.
      * @return - node to start checking path from while performing the rebalancing operations.
+     * @complexity O(1)
      */
     private AVLNode deleteNodeLeaf(AVLNode node){
         AVLNode parent = node.getParent();
@@ -285,6 +303,7 @@ public class AVLTree {
      * @param node - The node to physically delete from the tree.
      * @param child - The single child of the node to bypass the connection from parent to child.
      * @return - node to start checking path from while performing the rebalancing operations.
+     * @complexity O(1)
      */
     private AVLNode deleteNodeSingleChild(AVLNode node, AVLNode child) {
         AVLNode parent = node.getParent();
@@ -303,6 +322,7 @@ public class AVLTree {
      * Perform a physical delete operation from the tree when the node has two children.
      * @param node - The node to physically delete from the tree.
      * @return node to start checking path from while performing the rebalancing operations.
+     * @complexity O(log n); n number of nodes in tree
      */
     private AVLNode deleteNodeTwoChildren(AVLNode node){
         AVLNode successor = this.successorChild(node);
@@ -327,6 +347,7 @@ public class AVLTree {
      * Perform the physical delete operation of a node from the tree by classifying the node type.
      * @param node - The node to physically delete from the tree.
      * @return - node to start checking path from while performing the rebalancing operations.
+     * @complexity O(log n); n number of nodes in tree
      */
     private AVLNode deleteNode(AVLNode node) {
         AVLNode leftChild = node.getLeftVirtual();
@@ -349,6 +370,7 @@ public class AVLTree {
      * Checks if there is a need to change the pointer to the  minimum node while
      * performing a deletion operation. If so, then updates the pointer.
      * @param node - Deleted node to check if it were previously minimum.
+     * @complexity O(log n); n number of nodes in tree
      */
     private void updateMinDelete(AVLNode node) {
         AVLNode currentMin = this.getMin();
@@ -362,6 +384,7 @@ public class AVLTree {
      * Checks if there is a need to change the pointer to the  maximum node while
      * performing a deletion operation. If so, then updates the pointer.
      * @param node - Deleted node to check if it were previously maximum.
+     * @complexity O(log n); n number of nodes in tree
      */
     private void updateMaxDelete(AVLNode node) {
         AVLNode currentMax = this.getMax();
@@ -375,6 +398,7 @@ public class AVLTree {
      * Checks if there is a need to change the pointer to the maximum and or minimum node while
      * performing a deletion operation. If so, then updates the pointer.
      * @param node - Deleted node to check if it were previously minimum or maximum.
+     * @complexity O(log n); n number of nodes in tree
      */
     private void updateMinMaxDelete(AVLNode node) {
         updateMinDelete(node);
@@ -385,6 +409,7 @@ public class AVLTree {
      * Get the sum of true appearing in the node itself plus the sum of all of its descendants to its left.
      * @param node - the which we perform the calculation for.
      * @return - the sum of true in the the sub tree that start at node and includes all its left descendants.
+     * @complexity O(1)
      */
     private int calcLeftBooleanValueSum(AVLNode node) {
         int ret = node.getLeftVirtual().getBooleanValueSum();
@@ -398,6 +423,7 @@ public class AVLTree {
      * @pre - this.search(k) != null
      * @param k - key in tree
      * @return - xor value of all k's predeceasing keys, including itself.
+     * @complexity O(log n); n number of nodes in tree
      */
     public boolean prefixXor(int k){
         AVLNode node = this.searchNode(k);
@@ -419,6 +445,7 @@ public class AVLTree {
      * @pre - this.search(k) != null
      * @param k - key in tree
      * @return - xor value of all k's predeceasing keys, including itself.
+     * @complexity O(n); n number of nodes in tree
      */
     public boolean succPrefixXor(int k){
         AVLNode node = this.getMin();
@@ -434,6 +461,7 @@ public class AVLTree {
      * Get the successor of a node in the tree, given that the node has a right child.
      * @param node - Node to get its successor.
      * @return - Successor node.
+     * @complexity O(log n); n number of nodes in tree
      */
     private AVLNode successorChild(AVLNode node) {
         node = node.getRightVirtual();
@@ -447,6 +475,7 @@ public class AVLTree {
      * Get the successor of a node in the tree, given that the node doesn't have a right child.
      * @param node - Node to get its successor.
      * @return - Successor node if exists, else null.
+     * @complexity O(log n); n number of nodes in tree
      */
     private AVLNode successorParent(AVLNode node) {
         AVLNode next = node.getParent();
@@ -461,6 +490,7 @@ public class AVLTree {
      * Given a node in the tree, return the successor of the node.
      * @param node - Node to get its successor.
      * @return - Successor node if exists, else null.
+     * @complexity O(log n); n number of nodes in tree
      */
     public AVLNode successor(AVLNode node) {
         if (node.getRightVirtual().isRealNode()) {
@@ -473,6 +503,7 @@ public class AVLTree {
      * Get the predecessor of a node in the tree, given that the node has a left child.
      * @param node - Node to get its predecessor.
      * @return - Predecessor node.
+     * @complexity O(log n); n number of nodes in tree
      */
     private AVLNode predecessorChild(AVLNode node) {
         node = node.getLeftVirtual();
@@ -486,6 +517,7 @@ public class AVLTree {
      * Get the predecessor of a node in the tree, given that the node doesn't have a left child.
      * @param node - Node to get its successor.
      * @return - Predecessor node if exists, else null.
+     * @complexity O(log n); n number of nodes in tree
      */
     private AVLNode predecessorParent(AVLNode node) {
         AVLNode next = node.getParent();
@@ -500,6 +532,7 @@ public class AVLTree {
      * Get the predecessor of a node in the tree.
      * @param node - Node to get its successor.
      * @return - Predecessor node if exists, else null.
+     * @complexity O(log n); n number of nodes in tree
      */
     public AVLNode predecessor(AVLNode node) {
         if (node.getLeftVirtual().isRealNode()) {
@@ -511,6 +544,7 @@ public class AVLTree {
     /**
      * Get the info of the item with the smallest key in the tree.
      * @return If AVLTree isn't empty then info of value with smallest key in tree else null.
+     * @complexity O(1)
      */
     public Boolean min() {
         return this.getMin().getValue();
@@ -519,6 +553,7 @@ public class AVLTree {
     /**
      * Get the info of the item with the largest key in the tree.
      * @return If AVLTree isn't empty then info of value with largest key in tree else null.
+     * @complexity O(1)
      */
     public Boolean max() {
         return this.getMax().getValue();
@@ -527,6 +562,7 @@ public class AVLTree {
     /**
      * Get a sorted array by key of all AVLNodes in the tree.
      * @return - Sorted array of AVLNodes by key in tree, or an empty array if tree is empty.
+     * @complexity O(n); n number of nodes in tree
      */
     private AVLNode[] nodesToArray() {
         AVLNode[] arr = new AVLNode[this.getSize()];
@@ -541,6 +577,7 @@ public class AVLTree {
     /**
      * Get a sorted array by key of all keys in the tree.
      * @return - Sorted array of keys by key in the tree, or an empty array if tree is empty.
+     * @complexity O(n); n number of nodes in tree
      */
     public int[] keysToArray() {
         int[] arr = new int[this.getSize()];
@@ -554,6 +591,7 @@ public class AVLTree {
     /**
      * Get a sorted array by key of all info in the tree.
      * @return - Sorted array of info by key in the tree, or an empty array if tree is empty.
+     * @complexity O(n); n number of nodes in tree
      */
     public boolean[] infoToArray() {
         boolean[] arr = new boolean[this.getSize()];
@@ -567,6 +605,7 @@ public class AVLTree {
     /**
      * Get the number of nodes in the tree
      * @return - Returns the number of nodes in the tree.
+     * @complexity O(1)
      */
     public int size() {
         return this.getSize();
@@ -575,6 +614,7 @@ public class AVLTree {
     /**
      * Get the root node of the tree
      * @return - root, including virtual node if tree is empty.
+     * @complexity O(1)
      */
     public AVLNode getRootVirtual() {
         return this.root;
@@ -583,6 +623,7 @@ public class AVLTree {
     /**
      * Get the root node of the tree.
      * @return - if tree in not empty then AVLNode root, else null.
+     * @complexity O(1)
      */
     public AVLNode getRoot() {
         if (this.empty()) {
@@ -594,6 +635,7 @@ public class AVLTree {
     /**
      * Set the root of the tree.
      * @param root - Node to set as root
+     * @complexity O(1)
      */
     private void setRoot(AVLNode root) {
         this.root = root;
@@ -602,6 +644,7 @@ public class AVLTree {
     /**
      * Get the min node of the tree.
      * @return - Min node, including virtual node if tree is empty.
+     * @complexity O(1)
      */
     public AVLNode getMin() {
         return this.minNode;
@@ -610,6 +653,7 @@ public class AVLTree {
     /**
      * Set the minimum node of the tree
      * @param node - Node to set as min.
+     * @complexity O(1)
      */
     private void setMin(AVLNode node) {
         this.minNode = node;
@@ -618,6 +662,7 @@ public class AVLTree {
     /**
      * Get the minimum node of the tree by calculation.
      * @return - Min node, including virtual node if tree is empty.
+     * @complexity O(log n); n number of nodes in tree
      */
     private AVLNode calcMin() {
         AVLNode newMin = this.getRootVirtual();
@@ -634,6 +679,7 @@ public class AVLTree {
     /**
      * Get the max node of the tree.
      * @return - Max node, including virtual node if tree is empty.
+     * @complexity O(1)
      */
     public AVLNode getMax() {
         return this.maxNode;
@@ -642,6 +688,7 @@ public class AVLTree {
     /**
      * Set the maximum node of the tree
      * @param node - Node to set as max.
+     * @complexity O(1)
      */
     private void setMax(AVLNode node) {
         this.maxNode = node;
@@ -650,6 +697,7 @@ public class AVLTree {
     /**
      * Get the maximum node of the tree by calculation.
      * @return - Max node, including virtual node if tree is empty.
+     * @complexity O(log n); n number of nodes in tree
      */
     private AVLNode calcMax() {
         AVLNode newMax = this.getRootVirtual();
@@ -666,6 +714,7 @@ public class AVLTree {
     /**
      * Set the size of the tree.
      * @param size - New size of tree.
+     * @complexity O(1)
      */
     private void setSize(int size) {
         this.size = size;
@@ -673,6 +722,7 @@ public class AVLTree {
 
     /**
      * Increase the size of the tree by one.
+     * @complexity O(1)
      */
     private void incrementSize() {
         this.setSize(this.getSize() + 1);
@@ -680,6 +730,7 @@ public class AVLTree {
 
     /**
      * Decrease the size of the tree by one.
+     * @complexity O(1)
      */
     private void decrementSize() {
         this.setSize(this.getSize() - 1);
@@ -688,6 +739,7 @@ public class AVLTree {
     /**
      * Get the size of the tree
      * @return - size of tree.
+     * @complexity O(1)
      */
     public int getSize() {
         return this.size;
@@ -709,6 +761,12 @@ public class AVLTree {
         private int height;
         private int booleanValueSum;
 
+        /**
+         * Create an AVLNode object with key and value
+         * @param key - Key of new node
+         * @param value - Value of new node
+         * @complexity O(1)
+         */
         private AVLNode(int key, Boolean value) {
             this.setKey(key);
             this.setValue(value);
@@ -718,6 +776,10 @@ public class AVLTree {
             this.updateFields();
         }
 
+        /**
+         * Create an AVLNode object that represents a virtual node.
+         * @complexity O(1)
+         */
         private AVLNode() {
             this.setKey(-1);
             this.setValue(null);
@@ -727,6 +789,11 @@ public class AVLTree {
             this.updateFields();
         }
 
+        /**
+         * Create an AVLNode object that represents a virtual node with a parent.
+         * @param parent - Parent of new virtual node.
+         * @complexity O(1)
+         */
         private AVLNode(AVLNode parent) {
             this();
             this.setParent(parent);
@@ -735,6 +802,7 @@ public class AVLTree {
         /**
          * Set the node's key.
          * @param key - Key to set.
+         * @complexity O(1)
          */
         private void setKey(int key) {
             this.key = key;
@@ -743,6 +811,7 @@ public class AVLTree {
         /**
          * Get node's key
          * @return If real node return key, else -1.
+         * @complexity O(1)
          */
         public int getKey() {
             return this.key;
@@ -751,6 +820,7 @@ public class AVLTree {
         /**
          * Set the node's value
          * @param value - Value to set.
+         * @complexity O(1)
          */
         private void setValue(Boolean value) {
             this.value = value;
@@ -759,6 +829,7 @@ public class AVLTree {
         /**
          * Get the node's value.
          * @return - If real node return value, else null.
+         * @complexity O(1)
          */
         public Boolean getValue() {
             return this.value;
@@ -767,6 +838,7 @@ public class AVLTree {
         /**
          * Sets the left child of node, if not virtual, else does nothing.
          * @param node - Node to set as left node.
+         * @complexity O(1)
          */
         private void setLeft(AVLNode node) {
             if (this.isRealNode()) {
@@ -777,6 +849,7 @@ public class AVLTree {
         /**
          * Get the node's left child.
          * @return - If real node then return left child including virtual, else null.
+         * @complexity O(1)
          */
         public AVLNode getLeftVirtual() {
             return this.left;
@@ -785,6 +858,7 @@ public class AVLTree {
         /**
          * Get the node's left child.
          * @return - If left child exists return node, else null.
+         * @complexity O(1)
          */
         public AVLNode getLeft() {
             if (this.isRealNode() && this.left.isRealNode()) {
@@ -796,6 +870,7 @@ public class AVLTree {
         /**
          * Sets the right child of node, if not virtual, else does nothing.
          * @param node - Node to set as right node.
+         * @complexity O(1)
          */
         private void setRight(AVLNode node) {
             if (this.isRealNode()) {
@@ -806,6 +881,7 @@ public class AVLTree {
         /**
          * Get the node's right child.
          * @return - If real node then return right child including virtual, else null.
+         * @complexity O(1)
          */
         public AVLNode getRightVirtual() {
             return this.right;
@@ -814,6 +890,7 @@ public class AVLTree {
         /**
          * Get the node's left child.
          * @return - If left child exists return node, else null.
+         * @complexity O(1)
          */
         public AVLNode getRight() {
             if (this.isRealNode() && this.right.isRealNode()) {
@@ -825,6 +902,7 @@ public class AVLTree {
         /**
          * Sets the parent of node.
          * @param node - Node to set as parent node.
+         * @complexity O(1)
          */
         private void setParent(AVLNode node) {
             this.parent = node;
@@ -833,6 +911,7 @@ public class AVLTree {
         /**
          * Get the node's parent.
          * @return - If parent exists return node, else null.
+         * @complexity O(1)
          */
         public AVLNode getParent() {
             return this.parent;
@@ -841,6 +920,7 @@ public class AVLTree {
         /**
          * Checks if this is a virtual node or real node.
          * @return If real node returns true, else false.
+         * @complexity O(1)
          */
         public boolean isRealNode() {
             return this.key != -1;
@@ -849,6 +929,7 @@ public class AVLTree {
         /**
          * Sets the height of the node.
          * @param height - New height to set.
+         * @complexity O(1)
          */
         private void setHeight(int height) {
             this.height = height;
@@ -856,6 +937,7 @@ public class AVLTree {
 
         /**
          * Update the height of the node
+         * @complexity O(1)
          */
         private void updateHeight() {
             setHeight(this.calcHeight());
@@ -864,6 +946,7 @@ public class AVLTree {
         /**
          * Calculate the height of the node.
          * @return - Calculated height of the node.
+         * @complexity O(1)
          */
         private int calcHeight() {
             if (this.isRealNode()) {
@@ -875,6 +958,7 @@ public class AVLTree {
         /**
          * Get the height of the node.
          * @return - Return the height of the node if real node, else -1.
+         * @complexity O(1)
          */
         public int getHeight() {
             return this.height;
@@ -883,6 +967,7 @@ public class AVLTree {
         /**
          * Sets the booleanValueSum of the node.
          * @param booleanValueSum - booleanValueSum to set.
+         * @complexity O(1)
          */
         private void setBooleanValueSum(int booleanValueSum) {
             this.booleanValueSum = booleanValueSum;
@@ -890,6 +975,7 @@ public class AVLTree {
 
         /**
          * Update the field booleanValueSum.
+         * @complexity O(1)
          */
         private void updateBooleanValueSum() {
             setBooleanValueSum(this.calcBooleanValueSum());
@@ -898,6 +984,7 @@ public class AVLTree {
         /**
          * Calculate the booleanValueSum of the node.
          * @return - Calculated booleanValueSum of the node.
+         * @complexity O(1)
          */
         private int calcBooleanValueSum() {
             if (this.isRealNode()) {
@@ -911,6 +998,7 @@ public class AVLTree {
         /**
          * Get the booleanValueSum of the node.
          * @return booleanValueSum of the node.
+         * @complexity O(1)
          */
         private int getBooleanValueSum() {
             return this.booleanValueSum;
@@ -918,6 +1006,7 @@ public class AVLTree {
 
         /**
          * Update all the field of the node.
+         * @complexity O(1)
          */
         private void updateFields() {
             this.updateHeight();
@@ -927,6 +1016,7 @@ public class AVLTree {
         /**
          * Calculate the balance factor of the node.
          * @return BF of node.
+         * @complexity O(1)
          */
         public int getBF() {
             if (this.isRealNode()) {
@@ -937,6 +1027,7 @@ public class AVLTree {
 
         /**
          * Remove all the connections of the node from its parents and its children.
+         * @complexity O(1)
          */
         private void resetConnections() {
             this.setLeft(new AVLNode(this));
