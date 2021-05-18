@@ -353,7 +353,7 @@ public class AVLTree {
     private void updateMinDelete(AVLNode node) {
         AVLNode currentMin = this.getMin();
         if (currentMin == node) {
-            AVLNode newMin = calcMin();
+            AVLNode newMin = this.calcMin();
             this.setMin(newMin);
         }
     }
