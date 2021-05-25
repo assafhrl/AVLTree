@@ -83,8 +83,10 @@ public class AVLTree {
                 node = node.getParent();
                 node.getLeftVirtual().updateFields();
                 node.getRightVirtual().updateFields();
+                node.updateFields();
+            } else {
+                ops += node.updateFields();
             }
-            node.updateFields();
             node = node.getParent();
         }
         return ops;
@@ -936,11 +938,15 @@ public class AVLTree {
         }
 
         /**
-         * Update the height of the node
+         * Update the height of the node and report if it changed.
+         * @return - 1 if the height of the node changed, otherwise 0.
          * @complexity O(1)
          */
-        private void updateHeight() {
-            setHeight(this.calcHeight());
+        private int updateHeight() {
+            int newHeight = this.calcHeight();
+            int oldHeight = this.getHeight();
+            setHeight(newHeight);
+            return newHeight == oldHeight ? 0 : 1;
         }
 
         /**
@@ -1005,12 +1011,14 @@ public class AVLTree {
         }
 
         /**
-         * Update all the field of the node.
+         * Update all the field of the node and report if its height changed.
+         * @return - 1 if the height of the node changed, otherwise 0.
          * @complexity O(1)
          */
-        private void updateFields() {
-            this.updateHeight();
+        private int updateFields() {
+            int ret = this.updateHeight();
             this.updateBooleanValueSum();
+            return ret;
         }
 
         /**
