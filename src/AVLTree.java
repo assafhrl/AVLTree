@@ -1,4 +1,9 @@
 /**
+ * @author Asaf Harel, asafharel, 208945683
+ * @author Ori Opher, oriopher, 204805618
+ * */
+
+/**
  * public class AVLNode
  * <p>
  * This class represents an AVLTree with integer keys and boolean values.
